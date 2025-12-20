@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\Programming\Prog_Cpp\lab-assignment-3d-term\cpp-rpg-pathfinder\tests\TestGraph.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Programming\Prog_Cpp\lab-assignment-3d-term\cpp-rpg-pathfinder\tests\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{95AA0FF9-F6A7-3D36-9C95-E5682D3E93C8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

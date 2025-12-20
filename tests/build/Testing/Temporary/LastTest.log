@@ -1,0 +1,19 @@
+Start testing: Dec 20 15:51 RTZ 2 (зима)
+----------------------------------------------------------
+Test not available without configuration.  (Missing "-C <config>"?)
+1/1 Testing: GraphLogicTests
+1/1 Test: GraphLogicTests
+Command: "NOT_AVAILABLE"
+Directory: D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/tests/build
+"GraphLogicTests" start time: 
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"GraphLogicTests" end time: Dec 20 15:51 RTZ 2 (зима)
+"GraphLogicTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Dec 20 15:51 RTZ 2 (зима)

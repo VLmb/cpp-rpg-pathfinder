@@ -1,0 +1,10 @@
+^D:\PROGRAMMING\PROG_CPP\LAB-ASSIGNMENT-3D-TERM\CPP-RPG-PATHFINDER\TESTS\BUILD\CMAKEFILES\5F1BD5CA970D136964AAA5927589B011\GENERATE.STAMP.RULE
+setlocal
+D:\Apps\CMake\bin\cmake.exe -SD:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/tests -BD:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/tests/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/tests/build/AllTests.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

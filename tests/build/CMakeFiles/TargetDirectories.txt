@@ -1,0 +1,3 @@
+D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/tests/build/CMakeFiles/run_all_tests.dir
+D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/tests/build/CMakeFiles/ALL_BUILD.dir
+D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/tests/build/CMakeFiles/ZERO_CHECK.dir
