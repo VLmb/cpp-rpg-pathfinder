@@ -2,38 +2,61 @@
 
 #include <iostream>
 #include <fstream>
-
+#include <vector>
+#include <string>
 #include "../map-generation/MapGenerator.h"
+
+// Подключаем наш генератор, чтобы видеть TerrainType и Enum
+// Предполагаем, что MapGenerator.h лежит в правильном месте
+// #include "../map-generation/MapGenerator.h" 
 
 struct Color { int r, g, b; };
 
-// Функция, которая сопоставляет биом с цветом
+// Функция цветов: Мрачная / Реалистичная палитра
 Color GetBiomeColor(BiomeType type) {
     switch (type) {
-        case DEEP_WATER: return {0, 0, 128};     // Темно-синий
-        case WATER:      return {0, 100, 255};   // Синий
-        case SAND:       return {240, 240, 64};  // Песочный
-        case FOREST:     return {34, 139, 34};   // Лесной зеленый
-        case SWAMP:      return {47, 79, 79};    // Болотный
-        case MOUNTAIN:   return {139, 69, 19};   // Коричневый/Серый
-        case SNOW:       return {255, 255, 255}; // Белый
-        default:         return {255, 0, 255};   // Розовый (ошибка)
+        // Вода: Темно-синяя, почти черная в глубине
+        case WATER:      return {20, 45, 80};   
+
+        // Песок: Бледный, серовато-бежевый (не желтый!)
+        case SAND:       return {180, 175, 150}; 
+
+        // Равнина: Темно-оливковая, грязная трава
+        case PLAIN:      return {55, 70, 35};   
+
+        // Лес: Темно-хвойный
+        case FOREST:     return {25, 50, 25};   
+
+        // Чаща: Почти черная зелень
+        case DENSE_FOREST: return {10, 30, 15}; 
+
+        // Болото: Мрачный серо-зеленый
+        case SWAMP:      return {40, 50, 45};   
+
+        // Горы: Темно-серый камень, сланец
+        case MOUNTAIN:   return {60, 55, 50};   
+
+        // Снег: Светло-серый (не идеально белый, чтобы не резало глаза)
+        case SNOW:       return {200, 210, 220}; 
+
+        // Ошибка (Розовый)
+        default:         return {255, 0, 255};   
     }
 }
 
-void SaveMapToImage(const std::vector<std::vector<Tile>>& map, const std::string& filename) {
+// Принимаем TerrainType, так как именно он используется в GenerateMap
+void SaveMapToImage(const std::vector<std::vector<TerrainType>>& map, const std::string& filename) {
     int height = map.size();
     int width = map[0].size();
 
     std::ofstream img(filename);
     
-    // Заголовок PPM: P3, ширина, высота, макс. яркость
+    // PPM Header
     img << "P3\n" << width << " " << height << "\n255\n";
 
     for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
             Color c = GetBiomeColor(map[y][x].biome);
-            // Пишем R G B через пробел
             img << c.r << " " << c.g << " " << c.b << " ";
         }
         img << "\n";

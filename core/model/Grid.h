@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Enums.h"
+#include "map-generation/MapGenerator.h"
 #include <vector>
 #include <stdexcept>
 
@@ -16,9 +16,10 @@ struct Point {
     }
 };
 
-struct Cell {
-    TerrainType terrainType;
-    float noise;
+struct CellType {
+    float rockinessAvg;   
+    float vegetationAvg;  
+    float moistureAvg; 
 };
 
 class Grid {
@@ -28,7 +29,7 @@ private:
 
     int width;
     int height;
-    std::vector<Cell> cells;
+    std::vector<CellType> cells;
 
 public:
     Grid(int width, int height) {
@@ -43,6 +44,43 @@ public:
         cells.resize(height * width);
     }
 
+    Grid(std::vector<std::vector<TerrainType>>& map)
+     : Grid(static_cast<int>(map[0].size()) / 3, static_cast<int>(map.size()) / 3) {
+
+        const int srcH = static_cast<int>(map.size());
+        const int srcW = static_cast<int>(map[0].size());
+
+        if (srcW < 3 || srcH < 3)
+            throw std::invalid_argument("Source map must be at least 3x3 for 3x3 downsampling");
+
+        for (int srcY = 0; srcY + 2 < srcH; srcY += 3) {
+            for (int srcX = 0; srcX + 2 < srcW; srcX += 3) {
+
+                float r = 0.0f, v = 0.0f, m = 0.0f;
+
+                for (int dy = 0; dy < 3; ++dy) {
+                    for (int dx = 0; dx < 3; ++dx) {
+                        const auto& s = map[srcY + dy][srcX + dx];
+                        r += s.rockiness;
+                        v += s.vegetation;
+                        m += s.moisture;
+                    }
+                }
+
+                const int x = srcX / 3;
+                const int y = srcY / 3;
+
+                CellType c;
+                c.rockinessAvg  = r / 9.0f;
+                c.vegetationAvg = v / 9.0f;
+                c.moistureAvg   = m / 9.0f;
+
+                cells[indexOf(Point{x, y})] = c;
+            }
+        }
+
+    }
+
     int getWidth() const {
         return width;
     }
@@ -51,19 +89,19 @@ public:
         return height;
     }
 
-    Cell getCell(int x, int y) const {
+    CellType getCellType(int x, int y) const {
         if (x >= 0 && x < width && y >= 0 && y < height) {
             return cells[indexOf(Point{x, y})];
         } else {
-            throw std::out_of_range("Cell coordinates out of range");
+            throw std::out_of_range("CellType coordinates out of range");
         }
     }
 
-    void setCell(int x, int y, const Cell& cell) {
+    void setCellType(int x, int y, const CellType& cell) {
         if (x >= 0 && x < width && y >= 0 && y < height) {
             cells[indexOf(Point{x, y})] = cell;
         } else {
-            throw std::out_of_range("Cell coordinates out of range");
+            throw std::out_of_range("CellType coordinates out of range");
         }
     }
 

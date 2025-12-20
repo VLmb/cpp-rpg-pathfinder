@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 
 #include "../core/view/Renderer.h"
@@ -17,7 +19,9 @@ int main() {
 
     Perlin2D perlin(12345);
 
-    SaveMapToImage(GenerateMap(1000, 600, perlin), "D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/map.ppm");
+    int width = 10 * 12;
+    int height = 8 * 12;
+    SaveMapToImage(GenerateMap(width, height, perlin), "D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/map.ppm");
     
     return 0;
 }

@@ -1,15 +1,31 @@
 #pragma once
 
 #include "Enums.h"
+#include "Grid.h"
 
 class Hero {
 private:
     int health;
     int baseSpeed;
-public:
-    Hero(int initialHealth, int initialSpeed) : health(initialHealth), baseSpeed(initialSpeed) {}
 
-    virtual double getSpeed(TerrainType terrain) const = 0;
+    const int rockSpeed;
+    const int vegetationSpeed;
+    const int moistureSpeed;
+public:
+    Hero(int initialHealth, int initialSpeed,
+        const int rockSpeed,
+        const int vegetationSpeed,
+        const int moistureSpeed)
+        : health(initialHealth), baseSpeed(initialSpeed),
+        rockSpeed(rockSpeed),
+        vegetationSpeed(vegetationSpeed),
+        moistureSpeed(moistureSpeed) {}
+
+    double getSpeed(CellType terrain) {
+        return (terrain.rockinessAvg * rockSpeed + 
+                terrain.vegetationAvg * vegetationSpeed +
+                terrain.moistureAvg * moistureSpeed) * baseSpeed / 3.0f;
+    }
 
     int getHealth() const {
         return health;
@@ -26,57 +42,15 @@ public:
 
 class Elf : public Hero {
 public:
-    Elf() : Hero(120, 1.0) {}
-
-    double getSpeed(TerrainType terrain) const override {
-      switch (terrain)
-        {
-        case TerrainType::FOREST:
-            return getBaseSpeed() * 1.5;
-        case TerrainType::MOUNTAIN:
-            return getBaseSpeed() * 0.5;
-        case TerrainType::SWAMP:
-            return getBaseSpeed() * 1.0;
-        default:
-            return getBaseSpeed();
-        }
-    }
+    Elf() : Hero(120, 1.0, 1.0, 2.5, 1.5) {}  // rock, veget, moister
 };
 
 class Dwarf : public Hero {
 public:
-    Dwarf() : Hero(150, 1.0) {}
-
-    double getSpeed(TerrainType terrain) const override {
-        switch (terrain)
-        {
-        case TerrainType::FOREST:
-            return getBaseSpeed() * 0.5;
-        case TerrainType::MOUNTAIN:
-            return getBaseSpeed() * 1.5;
-        case TerrainType::SWAMP:
-            return getBaseSpeed() * 1.0;
-        default:
-            return getBaseSpeed();
-        }
-    }
+    Dwarf() : Hero(150, 1.0, 2.8, 1.2, 1.0) {}  // rock, veget, moister
 };
 
 class Human : public Hero {
 public:
-    Human() : Hero(100, 1.0) {}
-
-    double getSpeed(TerrainType terrain) const override {
-        switch (terrain)
-        {
-        case TerrainType::FOREST:
-            return getBaseSpeed() * 1.0;
-        case TerrainType::MOUNTAIN:
-            return getBaseSpeed() * 1.0;
-        case TerrainType::SWAMP:
-            return getBaseSpeed() * 1.0;
-        default:
-            return getBaseSpeed();
-        }
-    }
+    Human() : Hero(100, 1.0, 1.0, 1.0, 1.0) {}  // rock, veget, moister
 };
