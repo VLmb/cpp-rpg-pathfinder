@@ -80,6 +80,14 @@ public:
         return nullptr;
     }
 
+    const T* getPtr(const Key& key) const {
+        size_t idx = bucketIndex(key);
+        for (const auto& entry : buckets[idx]) {
+            if (equals(entry.key, key)) return &entry.value;
+        }
+        return nullptr;
+    }
+
     bool remove(const Key& key) {
         size_t idx = bucketIndex(key);
         auto& bucket = buckets[idx];

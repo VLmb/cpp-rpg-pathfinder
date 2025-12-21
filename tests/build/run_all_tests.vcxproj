@@ -335,7 +335,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="D:\Programming\Prog_Cpp\lab-assignment-3d-term\cpp-rpg-pathfinder\tests\TestRunner.cpp" />
     <ClCompile Include="D:\Programming\Prog_Cpp\lab-assignment-3d-term\cpp-rpg-pathfinder\tests\TestGraph.cpp" />
     <ClCompile Include="D:\Programming\Prog_Cpp\lab-assignment-3d-term\cpp-rpg-pathfinder\tests\TestPq.cpp" />
-    <ClCompile Include="D:\Programming\Prog_Cpp\lab-assignment-3d-term\cpp-rpg-pathfinder\tests\TestAStar.cpp" />
+    <ClCompile Include="D:\Programming\Prog_Cpp\lab-assignment-3d-term\cpp-rpg-pathfinder\tests\TestMapPathfinder.cpp" />
+    <ClCompile Include="D:\Programming\Prog_Cpp\lab-assignment-3d-term\cpp-rpg-pathfinder\tests\TestHashMap.cpp" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

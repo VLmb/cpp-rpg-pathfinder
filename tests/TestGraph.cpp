@@ -3,14 +3,13 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <algorithm>
 
-#include "../core/model/Graph.h"
+#include "../core/model/CheckpointGraph.h"
 #include "TestUtils.h"
 
 void testVertices() {
     std::cout << "\n--- Running testVertices ---\n";
-    Graph g(10, 10); 
+    CheckpointGraph g(10, 10);
 
     Point validP = { 5, 5 };
     Point invalidP = { 15, 5 };
@@ -32,7 +31,7 @@ void testVertices() {
 
 void testEdges() {
     std::cout << "\n--- Running testEdges ---\n";
-    Graph g(5, 5);
+    CheckpointGraph g(5, 5);
 
     Point p1 = { 0, 0 };
     Point p2 = { 0, 1 };
@@ -57,7 +56,7 @@ void testEdges() {
 
 void testNeighborsAndCleanup() {
     std::cout << "\n--- Running testNeighborsAndCleanup ---\n";
-    Graph g(4, 4);
+    CheckpointGraph g(4, 4);
 
     Point top = { 1, 0 };
     Point left = { 0, 1 };

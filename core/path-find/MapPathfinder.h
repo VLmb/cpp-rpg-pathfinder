@@ -9,7 +9,6 @@
 #include "../model/Grid.h"
 #include "../model/Hero.h"
 #include "AStar.h"
-#include "GraphPathfinder.h"
 
 struct PathKey {
     Point start;
@@ -52,6 +51,13 @@ private:
 
 public:
     MapPathfinder(Grid* grid) : grid(grid) {}
+
+    Point getGridCoordinate(Point checkpoint) {
+        return Point{
+            checkpoint.x * grid->getGridScale(),
+            checkpoint.y * grid->getGridScale()
+        };
+    }
 
     PathWithTime findPath(const Point& start, const Point& goal, Hero& hero) {
         if (auto* cached = pathCache.getPtr({ start, goal, &hero })) {

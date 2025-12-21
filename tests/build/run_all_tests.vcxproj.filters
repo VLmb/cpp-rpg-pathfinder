@@ -10,7 +10,10 @@
     <ClCompile Include="D:\Programming\Prog_Cpp\lab-assignment-3d-term\cpp-rpg-pathfinder\tests\TestPq.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Programming\Prog_Cpp\lab-assignment-3d-term\cpp-rpg-pathfinder\tests\TestAStar.cpp">
+    <ClCompile Include="D:\Programming\Prog_Cpp\lab-assignment-3d-term\cpp-rpg-pathfinder\tests\TestMapPathfinder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Programming\Prog_Cpp\lab-assignment-3d-term\cpp-rpg-pathfinder\tests\TestHashMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

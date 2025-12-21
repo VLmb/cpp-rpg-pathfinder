@@ -16,5 +16,6 @@ add_executable(run_all_tests
     TestRunner.cpp 
     TestGraph.cpp 
     TestPq.cpp
-    TestAStar.cpp
+    TestMapPathfinder.cpp
+    TestHashMap.cpp
 )

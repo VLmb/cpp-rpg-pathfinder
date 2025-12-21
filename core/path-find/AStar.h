@@ -70,7 +70,7 @@ public:
 
             if (currentIdx == goalIdx) {
                 auto path = buildPath(goalIdx, previous, graph);
-                return PathWithTime{buildPath(goalIdx, previous, graph), bestTimeFromStart[currentIdx]};
+                return PathWithTime{path, bestTimeFromStart[currentIdx]};
             }
 
             for (const auto& neighbor : graph->getNeighbors(currentIdx)) {
@@ -91,6 +91,7 @@ public:
             }
         }
 
-        return {};
+        return PathWithTime{ {}, std::numeric_limits<double>::infinity() };
+
     }
 };

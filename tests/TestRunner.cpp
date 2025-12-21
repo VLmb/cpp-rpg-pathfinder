@@ -1,24 +1,26 @@
-#pragma once
+// #pragma once
 
 #include <iostream>
 
 #include "../core/view/Renderer.h"
-#include "../core/map-generation/MapGenerator.h"
 #include "../core/map-generation/Perlin2D.h"
-// #include "TestPq.cpp"
-// #include "TestAStar.cpp"
-// #include "TestGraph.cpp"
+#include "TestPq.cpp"
+#include "TestHashMap.cpp"
+#include "TestMapPathfinder.cpp"
+#include "TestGraph.cpp"
 
-void runGraphTests();
-void runPqTests();
-void runAStarTests();
+// void runGraphTests();
+// void runPqTests();
+// void runMapPathfinderTests();
+// void runHashMapTests();
 
 int main() {
     std::cout << "========== STARTING ALL TESTS ==========\n";
 
     runPqTests();
     runGraphTests();
-    runAStarTests();
+    runHashMapTests();
+    runMapPathfinderTests();
 
     std::cout << "\n========== ALL TESTS FINISHED ==========\n";
 
@@ -26,7 +28,7 @@ int main() {
 
     int width = 10 * 12;
     int height = 8 * 12;
-    SaveMapToImage(GenerateMap(width, height, perlin), "D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/map.ppm");
+    // SaveMapToImage(GenerateMap(width, height, perlin), "D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/map.ppm");
     
     return 0;
 }

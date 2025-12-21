@@ -18,7 +18,11 @@ private:
     };
 
     double getStepTime(Point cur, Point next, Hero &hero) const override {
-        return (mapPathfinder->findPath(cur, next, hero)).time;
+        return (mapPathfinder->findPath(
+            mapPathfinder->getGridCoordinate(cur),
+            mapPathfinder->getGridCoordinate(next),
+            hero
+            )).time;
     }
 
 public:

@@ -17,7 +17,7 @@ private:
     static constexpr int MAX_DIMENSION = 200;
 
     int grid_scale;
-    int factor = map_generator::GRID_FACTOR;
+    static constexpr int factor = map_generator::GRID_FACTOR;
     std::vector<CellProperty> cells;
     std::vector<std::vector<map_generator::TerrainType>> map;
 
@@ -34,7 +34,7 @@ public:
     }
 
     Grid(std::vector<std::vector<map_generator::TerrainType>>& map, const int grid_scale = 1)
-        : Grid(static_cast<int>(map[0].size()) / 3, static_cast<int>(map.size()) / 3, grid_scale) {
+        : Grid(static_cast<int>(map[0].size()) / factor, static_cast<int>(map.size()) / factor, grid_scale) {
 
         this->map = map;
         this->grid_scale = grid_scale;
@@ -106,5 +106,13 @@ public:
         }
 
         return neighbors;
+    }
+
+    int getGridScale() const {
+        return grid_scale;
+    }
+
+    int getFactor() const {
+        return factor;
     }
 };
