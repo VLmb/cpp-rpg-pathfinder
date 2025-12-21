@@ -8,6 +8,7 @@ add_library(CoreLogic STATIC
         data-structure/PriorityQueue.h
         data-structure/DynamicArray.h
         data-structure/LinkedList.h
+        data-structure/HashMap.h
 )
 
 # Говорим, где искать .h файлы

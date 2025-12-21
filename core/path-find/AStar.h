@@ -4,6 +4,7 @@
 #include "model/Hero.h"
 #include "PathFinderInterface.h"
 #include "data-structure/PriorityQueue.h"
+#include "data-structure/HashMap.h"
 #include <vector>
 #include <limits>
 #include <cmath>
@@ -16,9 +17,40 @@ struct PointWithPriority {
     double priority; 
 };
 
+struct PathKey {
+    Point start;
+    Point goal;
+    Hero* hero;
+};
+
+struct PathKeyEq {
+    bool operator()(const PathKey& a, const PathKey& b) const noexcept {
+        return a.start.x == b.start.x && a.start.y == b.start.y &&
+               a.goal.x  == b.goal.x  && a.goal.y  == b.goal.y  &&
+               a.hero == b.hero;
+    }
+};
+
+static inline void hashCombine(std::size_t& seed, std::size_t v) noexcept {
+    seed ^= v + 0x9e3779b97f4a7c15ULL + (seed << 6) + (seed >> 2);
+}
+
+struct PathKeyHash {
+    std::size_t operator()(const PathKey& k) const noexcept {
+        std::size_t seed = 0;
+        hashCombine(seed, std::hash<int>{}(k.start.x));
+        hashCombine(seed, std::hash<int>{}(k.start.y));
+        hashCombine(seed, std::hash<int>{}(k.goal.x));
+        hashCombine(seed, std::hash<int>{}(k.goal.y));
+        hashCombine(seed, std::hash<const Hero*>{}(k.hero));
+        return seed;
+    }
+};
+
 class AStar : public PathFinderInterface<Point> {
 private:
     Grid& grid;
+    HashMap<PathKey, std::vector<Point>, PathKeyHash, PathKeyEq> pathCache;
 
     double manhattan(Point a, Point b) const {
         return static_cast<double>(std::abs(a.x - b.x) + std::abs(a.y - b.y));
@@ -73,6 +105,8 @@ public:
             }
 
             if (currentIdx == goalIdx) {
+                auto path = buildPath(goalIdx, previous);
+                pathCache.put({start, goal, &hero}, path);
                 return buildPath(goalIdx, previous);
             }
 
@@ -82,16 +116,16 @@ public:
 
                 int neighborIdx = grid.indexOf(neighbor);
 
-                double stepCost = hero.getTimeToCross(grid.getCellType(neighbor.x, neighbor.y));
+                double stepTime = hero.getTimeToCross(grid.getCellType(neighbor.x, neighbor.y));
 
-                double newG = bestTimeFromStart[currentIdx] + stepCost;
+                double newBestTime = bestTimeFromStart[currentIdx] + stepTime;
 
-                if (newG < bestTimeFromStart[neighborIdx]) {
-                    bestTimeFromStart[neighborIdx] = newG;
+                if (newBestTime < bestTimeFromStart[neighborIdx]) {
+                    bestTimeFromStart[neighborIdx] = newBestTime;
                     previous[neighborIdx] = currentIdx;
 
-                    double newF = newG + heuristic(neighbor, goal, hero);
-                    pq.enqueue(PointWithPriority{ neighbor, newG, newF });
+                    double newPr = newBestTime + heuristic(neighbor, goal, hero);
+                    pq.enqueue(PointWithPriority{ neighbor, newBestTime , newPr});
                 }
             }
         }
