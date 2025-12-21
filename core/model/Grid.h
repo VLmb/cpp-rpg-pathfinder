@@ -24,8 +24,8 @@ struct CellType {
 
 class Grid {
 private:
-    static const constexpr int MIN_DIMENSION = 3;
-    static const constexpr int MAX_DIMENSION = 200;
+    static constexpr int MIN_DIMENSION = 3;
+    static constexpr int MAX_DIMENSION = 200;
 
     int width;
     int height;
@@ -78,6 +78,9 @@ public:
                 cells[indexOf(Point{x, y})] = c;
             }
         }
+    }
+
+    static Grid createGrid(int width, int height, double scale = 0.0f) {
 
     }
 

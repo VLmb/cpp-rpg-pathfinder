@@ -1,15 +1,15 @@
 #pragma once
 
+#include "../data-structure/HashMap.h"
+#include "../data-structure/PriorityQueue.h"
 #include "../model/Grid.h"
 #include "../model/Hero.h"
-#include "PathFinderInterface.h"
-#include "../data-structure/PriorityQueue.h"
-#include "../data-structure/HashMap.h"
-#include <vector>
-#include <limits>
-#include <cmath>
-#include <stdexcept>
+#include "MapPathfinderInterface.h"
 #include <algorithm>
+#include <cmath>
+#include <limits>
+#include <stdexcept>
+#include <vector>
 
 struct PointWithPriority {
     Point point;
@@ -47,7 +47,7 @@ struct PathKeyHash {
     }
 };
 
-class AStar : public PathFinderInterface<Point> {
+class AStarMapPathfinder : public MapPathfinderInterface<Point> {
 private:
     Grid& grid;
     HashMap<PathKey, std::vector<Point>, PathKeyHash, PathKeyEq> pathCache;
@@ -70,7 +70,7 @@ private:
     }
 
 public:
-    explicit AStar(Grid& grid) : grid(grid) {}
+    explicit AStarMapPathfinder(Grid& grid) : grid(grid) {}
 
     std::vector<Point> findPath(const Point& start, const Point& goal, Hero& hero) override {
         if (!grid.inBounds(start) || !grid.inBounds(goal)) {

@@ -4,9 +4,8 @@
 #include "../model/Hero.h"
 
 template <typename T>
-class PathFinderInterface {
+class MapPathfinderInterface {
 public:
-    virtual ~PathFinderInterface() = default;
+    virtual ~MapPathfinderInterface() = default;
     virtual std::vector<T> findPath(const T& start, const T& goal, Hero& hero) = 0;
-
 };

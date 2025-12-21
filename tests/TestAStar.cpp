@@ -5,9 +5,9 @@
 #include <algorithm>
 #include <stdexcept>
 
-#include "../core/path-find/AStar.h"
 #include "../core/model/Grid.h"
 #include "../core/model/Hero.h"
+#include "../core/path-find/AStarFinder.h"
 #include "TestUtils.h"
 
 static void fillGrid(Grid& grid, const CellType& cell) {
@@ -25,7 +25,7 @@ void testStraightLinePath() {
     fillGrid(grid, plain);
 
     Human hero;
-    AStar astar(grid);
+    AStarFinder astar(grid);
 
     std::vector<Point> expected{{0, 0}, {1, 0}, {2, 0}};
     auto path = astar.findPath({0, 0}, {2, 0}, hero);
@@ -46,7 +46,7 @@ void testAvoidsCostlyCell() {
     grid.setCellType(1, 1, slow);
 
     Human hero;
-    AStar astar(grid);
+    AStarFinder astar(grid);
 
     auto path = astar.findPath({0, 1}, {2, 1}, hero);
 
@@ -67,7 +67,7 @@ void testStartEqualsGoal() {
     fillGrid(grid, plain);
 
     Human hero;
-    AStar astar(grid);
+    AStarFinder astar(grid);
 
     Point start{1, 1};
     auto path = astar.findPath(start, start, hero);
@@ -83,7 +83,7 @@ void testInvalidPoints() {
     fillGrid(grid, plain);
 
     Human hero;
-    AStar astar(grid);
+    AStarFinder astar(grid);
 
     bool threw = false;
     try {

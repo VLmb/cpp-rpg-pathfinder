@@ -17,6 +17,8 @@ private:
     const double vegetationSpeed;
     const double moistureSpeed;
 public:
+    virtual ~Hero() = default;
+
     Hero(double initialHealth, double initialSpeed,
         const double rockSpeed,
         const double vegetationSpeed,
