@@ -1,6 +1,6 @@
 #pragma once
 
-#include "map-generation/MapGenerator.h"
+#include "../map-generation/MapGenerator.h"
 #include <vector>
 #include <stdexcept>
 

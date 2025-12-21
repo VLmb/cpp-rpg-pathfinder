@@ -129,8 +129,8 @@ size_t DynamicArray<T>::getLength() const {
 }
 
 template<typename T>
-T* getPointer(int index) {
-        if (index < 0 || index >= getLength()) throw std::out_of_range("Index out of bounds");
+T* DynamicArray<T>::getPointer(int index) {
+        if (index < 0 || index >= size) throw std::out_of_range("Index out of bounds");
         return &data[index]; 
     }
 

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "model/Grid.h"
-#include "model/Hero.h"
+#include "../model/Grid.h"
+#include "../model/Hero.h"
 #include "PathFinderInterface.h"
-#include "data-structure/PriorityQueue.h"
-#include "data-structure/HashMap.h"
+#include "../data-structure/PriorityQueue.h"
+#include "../data-structure/HashMap.h"
 #include <vector>
 #include <limits>
 #include <cmath>
@@ -77,6 +77,10 @@ public:
             throw std::invalid_argument("Start or goal point is out of bounds");
         }
 
+        if (auto* cached = pathCache.getPtr({ start, goal, &hero })) {
+            return *cached;
+        }
+
         const int totalNodes = grid.getWidth() * grid.getHeight();
         const double INF = std::numeric_limits<double>::max();
 
@@ -100,7 +104,7 @@ public:
             PointWithPriority cur = pq.extractMin();
             const int currentIdx = grid.indexOf(cur.point);
 
-            if (cur.timeFromStart >= bestTimeFromStart[currentIdx]) {
+            if (cur.timeFromStart > bestTimeFromStart[currentIdx]) {
                 continue;
             }
 

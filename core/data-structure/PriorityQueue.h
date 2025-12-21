@@ -9,13 +9,14 @@ class PriorityQueue {
 private:
     DynamicArray<T> heap;
 
-
     std::function<bool(const T&, const T&)> comparator;
 
 private:
     bool less(const T& a, const T& b) const {
-        if (comparator) return comparator(a, b);
-        return a < b;
+        if (!comparator) {
+            throw std::logic_error("PriorityQueue: comparator is not set and T has no default ordering");
+        }
+        return comparator(a, b);
     }
 
     void siftUp(int index) {
@@ -70,11 +71,6 @@ public:
 
     void enqueue(const T& item) {
         heap.append(item);
-        siftUp(static_cast<int>(heap.getLength()) - 1);
-    }
-
-    void enqueue(T&& item) {
-        heap.append(std::move(item));
         siftUp(static_cast<int>(heap.getLength()) - 1);
     }
 

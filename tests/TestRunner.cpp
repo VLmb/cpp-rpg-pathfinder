@@ -5,15 +5,20 @@
 #include "../core/view/Renderer.h"
 #include "../core/map-generation/MapGenerator.h"
 #include "../core/map-generation/Perlin2D.h"
+// #include "TestPq.cpp"
+// #include "TestAStar.cpp"
+// #include "TestGraph.cpp"
 
 void runGraphTests();
 void runPqTests();
+void runAStarTests();
 
 int main() {
     std::cout << "========== STARTING ALL TESTS ==========\n";
 
     runPqTests();
     runGraphTests();
+    runAStarTests();
 
     std::cout << "\n========== ALL TESTS FINISHED ==========\n";
 

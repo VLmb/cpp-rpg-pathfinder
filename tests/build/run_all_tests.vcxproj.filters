@@ -10,6 +10,9 @@
     <ClCompile Include="D:\Programming\Prog_Cpp\lab-assignment-3d-term\cpp-rpg-pathfinder\tests\TestPq.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="D:\Programming\Prog_Cpp\lab-assignment-3d-term\cpp-rpg-pathfinder\tests\TestAStar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="D:\Programming\Prog_Cpp\lab-assignment-3d-term\cpp-rpg-pathfinder\tests\CMakeLists.txt" />

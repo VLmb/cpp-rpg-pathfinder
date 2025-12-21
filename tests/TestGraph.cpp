@@ -5,7 +5,7 @@
 #include <vector>
 #include <algorithm>
 
-#include "Graph.h" 
+#include "../core/model/Graph.h"
 #include "TestUtils.h"
 
 void testVertices() {

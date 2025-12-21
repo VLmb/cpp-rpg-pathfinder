@@ -10,17 +10,17 @@ enum class HeroType {
 
 class Hero {
 private:
-    int health;
-    int baseSpeed;
+    double health;
+    double baseSpeed;
 
-    const int rockSpeed;
-    const int vegetationSpeed;
-    const int moistureSpeed;
+    const double rockSpeed;
+    const double vegetationSpeed;
+    const double moistureSpeed;
 public:
-    Hero(int initialHealth, int initialSpeed,
-        const int rockSpeed,
-        const int vegetationSpeed,
-        const int moistureSpeed)
+    Hero(double initialHealth, double initialSpeed,
+        const double rockSpeed,
+        const double vegetationSpeed,
+        const double moistureSpeed)
         : health(initialHealth), baseSpeed(initialSpeed),
         rockSpeed(rockSpeed),
         vegetationSpeed(vegetationSpeed),
@@ -46,15 +46,15 @@ public:
         return 1.0f / (std::max({ rockSpeed, vegetationSpeed, moistureSpeed }) * baseSpeed);
     }
 
-    int getHealth() const {
+    double getHealth() const {
         return health;
     }
 
-    void setHealth(int newHealth) {
+    void setHealth(double newHealth) {
         health = newHealth;
     }
 
-    int getBaseSpeed() const {
+    double getBaseSpeed() const {
         return baseSpeed;
     }
 };
