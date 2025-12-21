@@ -1,28 +1,38 @@
 #pragma once
 #include <memory>
 
+#include "model/CheckpointGraph.h"
 #include "model/Grid.h"
-#include "path-find/AStarGraphPathFinder.h"
-#include "path-find/AStarMapPathfinder.h"
+#include "path-find/GraphPathfinder.h"
+#include "path-find/MapPathfinder.h"
+#include "view/MapRenderer.h"
+
 
 class PathfinderManager {
 private:
     std::unique_ptr<Grid> grid;
     std::unique_ptr<CheckpointGraph> graph;
     std::unique_ptr<Perlin2D> perlin;
-    std::unique_ptr<AStarMapPathfinder> mapPathfinder;
-    std::unique_ptr<AStarGraphPathFinder> graphPathfinder;
+    std::unique_ptr<MapPathfinder> mapPathfinder;
+    std::unique_ptr<GraphPathfinder> graphPathfinder;
+    std::unique_ptr<MapRenderer> mapRenderer;
 public:
     PathfinderManager(
         std::unique_ptr<Grid> grid,
+        std::unique_ptr<CheckpointGraph> graph,
         std::unique_ptr<Perlin2D> perlin,
-        std::unique_ptr<AStarMapPathfinder> mapPathfinder,
-        std::unique_ptr<AStarGraphPathFinder> graphPathfinder
+        std::unique_ptr<MapPathfinder> mapPathfinder,
+        std::unique_ptr<GraphPathfinder> graphPathfinder,
+        std::unique_ptr<MapRenderer> mapRenderer
         )
     : grid(std::move(grid)),
+    graph(std::move(graph)),
     perlin(std::move(perlin)),
     mapPathfinder(std::move(mapPathfinder)),
-    graphPathfinder(std::move(graphPathfinder)) {}
+    graphPathfinder(std::move(graphPathfinder)
+    ) {
+        this->mapRenderer = std::move(mapRenderer);
+    }
 
     PathfinderManager(
         int width, int height,
@@ -36,8 +46,60 @@ public:
         perlin = std::make_unique<Perlin2D>(seed);
         auto map = map_generator::GenerateMap(width, height, perlin.get(), scale);
         grid = std::make_unique<Grid>(map, map_generator::getGridScale(width, height));
-        mapPathfinder = std::make_unique<AStarMapPathfinder>(grid.get());
+        mapPathfinder = std::make_unique<MapPathfinder>(grid.get());
         graph = std::make_unique<CheckpointGraph>(width, height);
-        graphPathfinder = std::make_unique<AStarGraphPathFinder>(mapPathfinder.get(), graph.get());
+        graphPathfinder = std::make_unique<GraphPathfinder>( graph.get(), mapPathfinder.get());
+        mapRenderer = std::make_unique<MapRenderer>(map);
     }
+
+    bool addVertexToCheckpointGraph(Point checkpoint) {
+        if (!graph->addVertex(checkpoint)) {
+            return false;
+        }
+        int multiplier = map_generator::getMultFromCheckpointToPixels(graph->getWidth(), graph->getHeight());
+        mapRenderer->drawGraphVertices(
+            Point{checkpoint.x * multiplier, checkpoint.y * multiplier},
+            multiplier
+        );
+        return true;
+    }
+
+    bool addEdgeToCheckpointGraph(Point checkpoint1, Point checkpoint2) {
+        return graph->addEdge(checkpoint1, checkpoint2);
+    }
+
+    bool removeVertexFromCheckpointGraph(Point checkpoint) {
+        return graph->removeVertex(checkpoint);
+    }
+
+    bool removeEdgeFromCheckpointGraph(Point checkpoint1, Point checkpoint2) {
+        return graph->removeEdge(checkpoint1, checkpoint2);
+    }
+
+    std::vector<Point> findGridPath(Point checkpoint1, Point checkpoint2, Hero& hero) {
+        if (!graph->pointIsVertex(checkpoint1) || !graph->pointIsVertex(checkpoint2)) {
+            throw std::invalid_argument("Checkpoint graph does not have such vertex.");
+        }
+
+        auto pathWithTime = graphPathfinder->findPath(checkpoint1, checkpoint2, hero);
+
+        auto gridPath = mapPathfinder->makeGridPathFromCheckpointsPath(pathWithTime.path, hero);
+
+        return gridPath;
+    }
+
+    void findPathAndDraw(Point checkpoint1, Point checkpoint2, Hero& hero, const std::string& fileName) {
+        auto path = findGridPath(checkpoint1, checkpoint2, hero);
+        mapRenderer->drawPath(
+            path,
+            hero,
+            grid->getFactor()
+            );
+        mapRenderer->saveModifiedMap(fileName);
+    }
+
+    void renderAndSaveCurrentMap(const std::string& fileName) const {
+        mapRenderer->saveModifiedMap(fileName);
+    }
+
 };

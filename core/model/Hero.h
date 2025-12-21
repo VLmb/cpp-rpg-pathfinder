@@ -13,22 +13,27 @@ private:
     double health;
     double baseSpeed;
 
+    HeroType type;
+
     const double rockSpeed;
     const double vegetationSpeed;
     const double moistureSpeed;
-public:
-    virtual ~Hero() = default;
 
+protected:
     Hero(double initialHealth, double initialSpeed,
         const double rockSpeed,
         const double vegetationSpeed,
-        const double moistureSpeed)
+        const double moistureSpeed,
+        HeroType type
+        )
         : health(initialHealth), baseSpeed(initialSpeed),
         rockSpeed(rockSpeed),
         vegetationSpeed(vegetationSpeed),
-        moistureSpeed(moistureSpeed) {}
-
-    virtual HeroType getHeroType() const = 0;
+        moistureSpeed(moistureSpeed),
+        type(type)
+    {}
+public:
+    virtual ~Hero() = default;
 
     double getSpeed(CellProperty terrain) {
         return (terrain.rockinessAvg * rockSpeed + 
@@ -59,31 +64,23 @@ public:
     double getBaseSpeed() const {
         return baseSpeed;
     }
+
+    const HeroType getHeroType() const {
+        return type;
+    }
 };
 
-class Elf : public Hero {
+class WoodElf : public Hero {
 public:
-    Elf() : Hero(120, 1.0, 1.0, 2.5, 1.5) {}  // rock, veget, moister
-
-    HeroType getHeroType() const override {
-        return HeroType::Wood_Elf;
-    }
+    WoodElf() : Hero(120, 1.0, 1.0, 2.5, 1.5, HeroType::Wood_Elf) {}  // rock, veget, moister
 };
 
 class Dwarf : public Hero {
 public:
-    Dwarf() : Hero(150, 1.0, 2.8, 1.2, 1.0) {}  // rock, veget, moister
-
-    HeroType getHeroType() const override {
-        return HeroType::Dwarf;
-    }
+    Dwarf() : Hero(150, 1.0, 2.8, 1.2, 1.0, HeroType::Dwarf) {}  // rock, veget, moister
 };
 
 class Human : public Hero {
 public:
-    Human() : Hero(100, 1.0, 1.0, 1.0, 1.0) {}  // rock, veget, moister
-
-    HeroType getHeroType() const override {
-        return HeroType::Human;
-    }
+    Human() : Hero(100, 1.0, 1.0, 1.0, 1.0, HeroType::Human) {}  // rock, veget, moister
 };

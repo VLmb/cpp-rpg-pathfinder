@@ -56,9 +56,9 @@ namespace  map_generator {
     inline constexpr double SIZE_T1 = 10.0;
     inline constexpr double SIZE_T2 = 30.0;
 
-    inline constexpr double SCALE_T1 = 20.0;
-    inline constexpr double SCALE_T2 = 30.0;
-    inline constexpr double SCALE_T3 = 40.0;
+    inline constexpr double SCALE_T1 = 40.0;
+    inline constexpr double SCALE_T2 = 80.0;
+    inline constexpr double SCALE_T3 = 100.0;
 
     inline constexpr int FACTOR_T1 = 4;
     inline constexpr int FACTOR_T2 = 3;
@@ -94,6 +94,10 @@ namespace  map_generator {
         return FACTOR_T3;
     }
 
+    inline int getMultFromCheckpointToPixels(int width, int height) {
+        return getGridScale(width, height) * GRID_FACTOR;
+    }
+
     inline std::vector<std::vector<TerrainType>> GenerateMap(const int width, const int height, Perlin2D* perlin, double scale = 0.0f) {
         int modifiedWidth = width;
         int modifiedHeight = height;
@@ -112,8 +116,8 @@ namespace  map_generator {
         const int OFFSET_M = 13900;
 
         // --- ПРОХОД 1 ---
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
+        for (int y = 0; y < modifiedHeight; y++) {
+            for (int x = 0; x < modifiedWidth; x++) {
                 double rVal = perlin->Noise((x + OFFSET_R) / scale, (y + OFFSET_R) / scale, 4, 0.5f);
                 double vVal = perlin->Noise((x + OFFSET_V) / scale, (y + OFFSET_V) / scale, 3, 0.4f);
                 double mVal = perlin->Noise((x + OFFSET_M) / scale, (y + OFFSET_M) / scale, 2, 0.5f);
@@ -135,8 +139,8 @@ namespace  map_generator {
         if (maxM == minM) maxM += 0.001f;
 
         // --- ПРОХОД 2 ---
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
+        for (int y = 0; y < modifiedHeight; y++) {
+            for (int x = 0; x < modifiedWidth; x++) {
                 double nR = (map[y][x].rockiness - minR) / (maxR - minR);
                 double nV = (map[y][x].vegetation - minV) / (maxV - minV);
                 double nM = (map[y][x].moisture - minM) / (maxM - minM);

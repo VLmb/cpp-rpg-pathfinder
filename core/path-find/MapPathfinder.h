@@ -68,4 +68,21 @@ public:
 
         return path;
     }
+
+    std::vector<Point> makeGridPathFromCheckpointsPath(std::vector<Point> checkpoints, Hero& hero) {
+        std::vector<Point> gridPath;
+
+        if (checkpoints.size() < 2) {
+            return {};
+        }
+
+        for (int i = 0; i < checkpoints.size() - 1; i++) {
+            auto checkpoint1 = getGridCoordinate(checkpoints[i]);
+            auto checkpoint2 = getGridCoordinate(checkpoints[i + 1]);
+            auto partGripPath = findPath(checkpoint1, checkpoint2, hero).path;
+            gridPath.insert(gridPath.end(), partGripPath.begin(), partGripPath.end());
+        }
+
+        return gridPath;
+    }
 };

@@ -2,12 +2,12 @@
 
 #include <iostream>
 
-#include "../core/view/Renderer.h"
 #include "../core/map-generation/Perlin2D.h"
-#include "TestPq.cpp"
+#include "../core/view/MapRenderer.h"
+#include "TestGraph.cpp"
 #include "TestHashMap.cpp"
 #include "TestMapPathfinder.cpp"
-#include "TestGraph.cpp"
+#include "TestPq.cpp"
 
 // void runGraphTests();
 // void runPqTests();

@@ -1,10 +1,8 @@
 #pragma once
 
 #include <vector>
-#include <unordered_set>
 #include <stdexcept>
 #include <algorithm>
-#include <cstdint>
 
 #include "AbstractGraph.h"
 
@@ -27,6 +25,13 @@ public:
             return true;
         }
 
+        return false;
+    }
+
+    bool pointIsVertex(Point point) {
+        if (inBounds(point)) {
+            return isVertex[indexOf(point)];
+        }
         return false;
     }
 

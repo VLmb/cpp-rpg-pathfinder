@@ -13,8 +13,8 @@ struct CellProperty {
 
 class Grid : public AbstractGraph {
 private:
-    static constexpr int MIN_DIMENSION = 3;
-    static constexpr int MAX_DIMENSION = 200;
+    static constexpr int MIN_DIMENSION = 5;
+    static constexpr int MAX_DIMENSION = 400;
 
     int grid_scale;
     static constexpr int factor = map_generator::GRID_FACTOR;
