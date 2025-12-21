@@ -3,7 +3,8 @@ add_library(CoreLogic STATIC
         model/Enums.h
         model/Hero.h
         model/LinkedList.h
-        model/Graph.h
+        model/AbstractGraph.h
+        model/CheckpointGraph.h
         model/Grid.h
         data-structure/PriorityQueue.h
         data-structure/DynamicArray.h

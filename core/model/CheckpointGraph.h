@@ -6,38 +6,24 @@
 #include <algorithm>
 #include <cstdint>
 
-#include "Grid.h"
+#include "AbstractGraph.h"
 
-class Graph {
-
+class CheckpointGraph : public AbstractGraph {
 private:
-    int width;
-    int height;
     std::vector<bool> isVertex;
     std::vector<std::vector<int>> adjList;
-
-    bool isBounds(int x, int y) const {
-        return x >= 0 && x < width && y >= 0 && y < height;
-    }
-
-    int indexOf(int x, int y) const {
-        return x + y * width;
-    }
-
-    Point point(int index) const {
-        return Point{ index % width, index / width };
-    }
 
     bool hasNeighbor(const std::vector<int>& neighbors, int index) const {
         return std::find(neighbors.begin(), neighbors.end(), index) != neighbors.end();
     }
 
 public:
-    Graph(int width, int height) : width(width), height(height), isVertex(width * height), adjList(width * height) {}
+    CheckpointGraph(int width, int height)
+        : AbstractGraph(width, height), isVertex(width * height), adjList(width * height) {}
 
     bool addVertex(Point point) {
-        if (isBounds(point.x, point.y)) {
-            isVertex[indexOf(point.x, point.y)] = true;
+        if (inBounds(point)) {
+            isVertex[indexOf(point)] = true;
             return true;
         }
 
@@ -45,8 +31,8 @@ public:
     }
 
     bool removeVertex(Point point) {
-        if (isBounds(point.x, point.y)) {
-            int idx = indexOf(point.x, point.y);
+        if (inBounds(point)) {
+            int idx = indexOf(point);
             for (int nb : adjList[idx]) {
                 auto& v = adjList[nb];
                 v.erase(std::remove(v.begin(), v.end(), idx), v.end());
@@ -60,14 +46,14 @@ public:
     }
 
     bool addEdge(Point a, Point b) {
-        if (isBounds(a.x, a.y) && isBounds(b.x, b.y)) {
-            int indexA = indexOf(a.x, a.y);
-            int indexB = indexOf(b.x, b.y);
+        if (inBounds(a) && inBounds(b)) {
+            int indexA = indexOf(a);
+            int indexB = indexOf(b);
 
             if (indexA == indexB) return false;
 
-            if (isVertex[indexA] && isVertex[indexB] 
-                && !hasNeighbor(adjList[indexA], indexB) 
+            if (isVertex[indexA] && isVertex[indexB]
+                && !hasNeighbor(adjList[indexA], indexB)
                 && !hasNeighbor(adjList[indexB], indexA)) {
                 adjList[indexA].push_back(indexB);
                 adjList[indexB].push_back(indexA);
@@ -79,9 +65,9 @@ public:
     }
 
     bool removeEdge(Point a, Point b) {
-        if (isBounds(a.x, a.y) && isBounds(b.x, b.y)) {
-            int indexA = indexOf(a.x, a.y);
-            int indexB = indexOf(b.x, b.y);
+        if (inBounds(a) && inBounds(b)) {
+            int indexA = indexOf(a);
+            int indexB = indexOf(b);
 
             if (isVertex[indexA] && isVertex[indexB]
                 && hasNeighbor(adjList[indexA], indexB)
@@ -96,9 +82,9 @@ public:
     }
 
     bool hasEdge(Point a, Point b) const {
-        if (isBounds(a.x, a.y) && isBounds(b.x, b.y)) {
-            int indexA = indexOf(a.x, a.y);
-            int indexB = indexOf(b.x, b.y);
+        if (inBounds(a) && inBounds(b)) {
+            int indexA = indexOf(a);
+            int indexB = indexOf(b);
 
             if (isVertex[indexA] && isVertex[indexB]) {
                 return hasNeighbor(adjList[indexA], indexB);
@@ -109,8 +95,8 @@ public:
     }
     
     bool neighborsIdx(Point v, std::vector<int>& result) const {
-        if (isBounds(v.x, v.y)) {
-            int idx = indexOf(v.x, v.y);
+        if (inBounds(v)) {
+            int idx = indexOf(v);
             if (isVertex[idx]) {
                 result = adjList[idx];
                 return true;
@@ -121,11 +107,11 @@ public:
     }
 
     bool neighbors(Point v, std::vector<Point>& result) const {
-        if (isBounds(v.x, v.y)) {
-            int idx = indexOf(v.x, v.y);
+        if (inBounds(v)) {
+            int idx = indexOf(v);
             if (isVertex[idx]) {
                 for (int neighborIdx : adjList[idx]) {
-                    result.push_back(point(neighborIdx));
+                    result.push_back(pointOfIndex(neighborIdx));
                 }
                 return true;
             }
@@ -134,4 +120,20 @@ public:
         return false;;
     }
 
+    std::vector<Point> getNeighbors(int idx) const override {
+        if (idx < 0 || idx >= width * height) {
+            throw std::out_of_range("CheckpointGraph::getNeighbors: idx out of bounds");
+        }
+
+        std::vector<Point> result;
+        if (!isVertex[idx]) return result;
+
+        for (int neighborIdx : adjList[idx]) {
+            result.push_back(pointOfIndex(neighborIdx));
+        }
+
+        return result;
+    }
+
+    std::vector<std::vector<int>> getAdjList() const { return adjList; }
 };

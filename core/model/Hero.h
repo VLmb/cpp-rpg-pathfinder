@@ -30,13 +30,13 @@ public:
 
     virtual HeroType getHeroType() const = 0;
 
-    double getSpeed(CellType terrain) {
+    double getSpeed(CellProperty terrain) {
         return (terrain.rockinessAvg * rockSpeed + 
                 terrain.vegetationAvg * vegetationSpeed +
                 terrain.moistureAvg * moistureSpeed) * baseSpeed / 3.0f;
     }
 
-    double getTimeToCross(CellType terrain) {
+    double getTimeToCross(CellProperty terrain) {
         return 1.0f / getSpeed(terrain);
     }
 

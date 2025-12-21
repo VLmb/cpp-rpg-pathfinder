@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-#include <iostream>
 #include <algorithm>
 #include <cmath>
 #include "Perlin2D.h"
@@ -31,27 +30,27 @@ namespace  map_generator {
     // Логика определения биома
     inline BiomeType GetBiome(double r, double v, double m) {
         // 1. Уровень воды (объединили глубокую и обычную)
-        if (r < 0.30f) return WATER;
+        if (r < 0.30f) return BiomeType::WATER;
 
         // 2. Горы и Высокогорье
         if (r > 0.75f) {
-            if (m > 0.75f) return SNOW;    // Снежные пики
-            return MOUNTAIN;               // Голые темные скалы
+            if (m > 0.75f) return BiomeType::SNOW;    // Снежные пики
+            return BiomeType::MOUNTAIN;               // Голые темные скалы
         }
 
         // 3. Болота (Низменности с высокой влажностью)
         // r < 0.55 гарантирует, что болота в низинах
-        if (m > 0.70f && r < 0.55f) return SWAMP;
+        if (m > 0.70f && r < 0.55f) return BiomeType::SWAMP;
 
         // 4. Лесные массивы
-        if (v > 0.75f) return DENSE_FOREST; // Чаща
-        if (v > 0.45f) return FOREST;       // Обычный лес
+        if (v > 0.75f) return BiomeType::DENSE_FOREST; // Чаща
+        if (v > 0.45f) return BiomeType::FOREST;       // Обычный лес
 
         // 5. Открытые пространства (мало растительности)
-        if (m < 0.30f) return SAND;         // Сухо = Песчаная пустошь
+        if (m < 0.30f) return BiomeType::SAND;         // Сухо = Песчаная пустошь
 
         // Дефолт: Равнина (Трава)
-        return PLAIN;
+        return BiomeType::PLAIN;
     }
 
     inline constexpr double SIZE_T1 = 10.0;
@@ -83,13 +82,25 @@ namespace  map_generator {
         }
     }
 
-    inline std::vector<std::vector<TerrainType>> GenerateMap(const int width, const int height, Perlin2D& perlin, double scale = 0.0f) {
-        std::vector<std::vector<TerrainType>> map(height, std::vector<TerrainType>(width));
+    inline int getGridScale(int width, int height) {
+        int minSize = std::min(width, height);
+        if (minSize < SIZE_T1) {
+            return FACTOR_T1;
+        }
+        if (minSize < SIZE_T2) {
+            return FACTOR_T2;
+        }
 
+        return FACTOR_T3;
+    }
+
+    inline std::vector<std::vector<TerrainType>> GenerateMap(const int width, const int height, Perlin2D* perlin, double scale = 0.0f) {
         int modifiedWidth = width;
         int modifiedHeight = height;
 
         calculateParams(modifiedWidth, modifiedHeight, scale);
+
+        std::vector<std::vector<TerrainType>> map(modifiedHeight, std::vector<TerrainType>(modifiedWidth, TerrainType()));
 
         // Границы для нормализации
         double minR = 1000.0f, maxR = -1000.0f;
@@ -103,9 +114,9 @@ namespace  map_generator {
         // --- ПРОХОД 1 ---
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                double rVal = perlin.Noise((x + OFFSET_R) / scale, (y + OFFSET_R) / scale, 4, 0.5f);
-                double vVal = perlin.Noise((x + OFFSET_V) / scale, (y + OFFSET_V) / scale, 3, 0.4f);
-                double mVal = perlin.Noise((x + OFFSET_M) / scale, (y + OFFSET_M) / scale, 2, 0.5f);
+                double rVal = perlin->Noise((x + OFFSET_R) / scale, (y + OFFSET_R) / scale, 4, 0.5f);
+                double vVal = perlin->Noise((x + OFFSET_V) / scale, (y + OFFSET_V) / scale, 3, 0.4f);
+                double mVal = perlin->Noise((x + OFFSET_M) / scale, (y + OFFSET_M) / scale, 2, 0.5f);
 
                 if (rVal < minR) minR = rVal; if (rVal > maxR) maxR = rVal;
                 if (vVal < minV) minV = vVal; if (vVal > maxV) maxV = vVal;

@@ -3,49 +3,41 @@
 #include "../map-generation/MapGenerator.h"
 #include <vector>
 #include <stdexcept>
+#include "AbstractGraph.h"
 
-struct Point {
-    int x, y;
-
-    bool operator==(const Point& other) const {
-        return x == other.x && y == other.y;
-    }
-
-    bool operator!=(const Point& other) const {
-        return !(*this == other);
-    }
+struct CellProperty {
+    float rockinessAvg;
+    float vegetationAvg;
+    float moistureAvg;
 };
 
-struct CellType {
-    float rockinessAvg;   
-    float vegetationAvg;  
-    float moistureAvg; 
-};
-
-class Grid {
+class Grid : public AbstractGraph {
 private:
     static constexpr int MIN_DIMENSION = 3;
     static constexpr int MAX_DIMENSION = 200;
 
-    int width;
-    int height;
-    std::vector<CellType> cells;
+    int grid_scale;
+    int factor = map_generator::GRID_FACTOR;
+    std::vector<CellProperty> cells;
+    std::vector<std::vector<map_generator::TerrainType>> map;
 
 public:
-    Grid(int width, int height) {
+    Grid(int width, int height, const int grid_scale = 1)
+        : AbstractGraph(width, height), grid_scale(grid_scale) {
         if (width < MIN_DIMENSION || height < MIN_DIMENSION) {
             throw std::invalid_argument("Grid dimensions must be greater than 2");
         }
         if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
             throw std::invalid_argument("Grid dimensions must be less than or equal to 200");
         }
-        this->width = width;
-        this->height = height;
         cells.resize(height * width);
     }
 
-    Grid(std::vector<std::vector<TerrainType>>& map)
-     : Grid(static_cast<int>(map[0].size()) / 3, static_cast<int>(map.size()) / 3) {
+    Grid(std::vector<std::vector<map_generator::TerrainType>>& map, const int grid_scale = 1)
+        : Grid(static_cast<int>(map[0].size()) / 3, static_cast<int>(map.size()) / 3, grid_scale) {
+
+        this->map = map;
+        this->grid_scale = grid_scale;
 
         const int srcH = static_cast<int>(map.size());
         const int srcW = static_cast<int>(map[0].size());
@@ -70,56 +62,49 @@ public:
                 const int x = srcX / 3;
                 const int y = srcY / 3;
 
-                CellType c;
-                c.rockinessAvg  = r / 9.0f;
+                CellProperty c;
+                c.rockinessAvg = r / 9.0f;
                 c.vegetationAvg = v / 9.0f;
-                c.moistureAvg   = m / 9.0f;
+                c.moistureAvg = m / 9.0f;
 
-                cells[indexOf(Point{x, y})] = c;
+                cells[indexOf(Point{ x, y })] = c;
             }
         }
     }
 
-    static Grid createGrid(int width, int height, double scale = 0.0f) {
-
-    }
-
-    int getWidth() const {
-        return width;
-    }
-
-    int getHeight() const {
-        return height;
-    }
-
-    CellType getCellType(int x, int y) const {
-        if (x >= 0 && x < width && y >= 0 && y < height) {
-            return cells[indexOf(Point{x, y})];
-        } else {
-            throw std::out_of_range("CellType coordinates out of range");
+    CellProperty getCellType(int x, int y) const {
+        if (inBounds(x, y)) {
+            return cells[indexOf(Point{ x, y })];
         }
+        throw std::out_of_range("CellType coordinates out of range");
     }
 
-    void setCellType(int x, int y, const CellType& cell) {
-        if (x >= 0 && x < width && y >= 0 && y < height) {
-            cells[indexOf(Point{x, y})] = cell;
-        } else {
-            throw std::out_of_range("CellType coordinates out of range");
+    void setCellType(int x, int y, const CellProperty& cell) {
+        if (inBounds(x, y)) {
+            cells[indexOf(Point{ x, y })] = cell;
+            return;
         }
+        throw std::out_of_range("CellType coordinates out of range");
     }
 
-    bool inBounds(Point p) const {
-        return p.x >= 0 && p.y >= 0 && p.x < width && p.y < height;
-    }
+    std::vector<Point> getNeighbors(int idx) const override {
+        if (idx < 0 || idx >= width * height) {
+            throw std::out_of_range("Grid::getNeighbors: idx out of bounds");
+        }
 
-    int indexOf(Point p) const {
-        if (!inBounds(p)) throw std::out_of_range("Grid::indexOf: point out of bounds");
-        return p.y * width + p.x;
-    }
+        Point p = pointOfIndex(idx);
+        const Point directions[4] = { {1, 0}, {-1, 0}, {0, 1}, {0, -1} };
 
-    Point pointOfIndex(int idx) const {
-        if (idx < 0 || idx >= width * height) throw std::out_of_range("Grid::pointOfIndex: idx out of bounds");
-        return Point{ idx % width, idx / width };
-    }
+        std::vector<Point> neighbors;
+        neighbors.reserve(4);
 
+        for (const auto& dir : directions) {
+            Point next{ p.x + dir.x, p.y + dir.y };
+            if (inBounds(next)) {
+                neighbors.push_back(next);
+            }
+        }
+
+        return neighbors;
+    }
 };
