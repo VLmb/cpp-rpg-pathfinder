@@ -3,9 +3,10 @@
 #include "Grid.h"
 
 enum class HeroType {
-    Wood_Elf,
-    Dwarf,
-    Human
+    ORC,
+    WOOD_ELF,
+    HUMAN,
+    GNOME
 };
 
 class Hero {
@@ -15,30 +16,30 @@ private:
 
     HeroType type;
 
-    const double rockSpeed;
-    const double vegetationSpeed;
-    const double moistureSpeed;
+    const double temperaturePreference;
+    const double altitudePreference;
+    const double moisturePreference;
 
 protected:
     Hero(double initialHealth, double initialSpeed,
-        const double rockSpeed,
-        const double vegetationSpeed,
-        const double moistureSpeed,
+        const double temperaturePreference,
+        const double altitudePreference,
+        const double moisturePreference,
         HeroType type
         )
         : health(initialHealth), baseSpeed(initialSpeed),
-        rockSpeed(rockSpeed),
-        vegetationSpeed(vegetationSpeed),
-        moistureSpeed(moistureSpeed),
+        temperaturePreference(temperaturePreference),
+        altitudePreference(altitudePreference),
+        moisturePreference(moisturePreference),
         type(type)
     {}
 public:
     virtual ~Hero() = default;
 
     double getSpeed(CellProperty terrain) {
-        return (terrain.rockinessAvg * rockSpeed + 
-                terrain.vegetationAvg * vegetationSpeed +
-                terrain.moistureAvg * moistureSpeed) * baseSpeed / 3.0f;
+        return (terrain.rockinessAvg * temperaturePreference +
+                terrain.vegetationAvg * altitudePreference +
+                terrain.moistureAvg * moisturePreference) * baseSpeed / 3.0f;
     }
 
     double getTimeToCross(CellProperty terrain) {
@@ -46,11 +47,11 @@ public:
     }
 
     double getMaxTimeToCross() {
-        return 1.0f / (std::min({ rockSpeed, vegetationSpeed, moistureSpeed }) * baseSpeed);
+        return 1.0f / (std::min({ temperaturePreference, altitudePreference, moisturePreference }) * baseSpeed);
     }
 
     double getMinTimeToCross() {
-        return 1.0f / (std::max({ rockSpeed, vegetationSpeed, moistureSpeed }) * baseSpeed);
+        return 1.0f / (std::max({ temperaturePreference, altitudePreference, moisturePreference }) * baseSpeed);
     }
 
     double getHealth() const {
@@ -72,15 +73,20 @@ public:
 
 class WoodElf : public Hero {
 public:
-    WoodElf() : Hero(120, 1.0, 1.0, 2.5, 1.5, HeroType::Wood_Elf) {}  // rock, veget, moister
+    WoodElf() : Hero(120, 1.0, 3.0f, 1.0f, 12.0f, HeroType::WOOD_ELF) {}  // rock, veget, moister
 };
 
-class Dwarf : public Hero {
+class Orc : public Hero {
 public:
-    Dwarf() : Hero(150, 1.0, 2.8, 1.2, 1.0, HeroType::Dwarf) {}  // rock, veget, moister
+    Orc() : Hero(150, 1.0, 12.0f, 3.0f, 1.0f, HeroType::ORC) {}  // rock, veget, moister
+};
+
+class Gnome : public Hero {
+public:
+    Gnome(): Hero(150, 1.0, 100.0f, 1.0f, 1000.0f, HeroType::ORC) {}
 };
 
 class Human : public Hero {
 public:
-    Human() : Hero(100, 1.0, 1.0, 1.0, 1.0, HeroType::Human) {}  // rock, veget, moister
+    Human() : Hero(100, 5.0f, 5.0f, 5.0f, 1.0f, HeroType::HUMAN) {}  // rock, veget, moister
 };

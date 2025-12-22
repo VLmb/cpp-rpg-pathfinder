@@ -23,25 +23,149 @@ private:
 
     Color getBiomeColor(map_generator::BiomeType type) const {
         switch (type) {
-            case map_generator::BiomeType::WATER: return {20, 45, 80};
-            case map_generator::BiomeType::SAND: return {180, 175, 150};
-            case map_generator::BiomeType::PLAIN: return {55, 70, 35};
-            case map_generator::BiomeType::FOREST: return {25, 50, 25};
-            case map_generator::BiomeType::DENSE_FOREST: return {10, 30, 15};
-            case map_generator::BiomeType::SWAMP: return {40, 50, 45};
-            case map_generator::BiomeType::MOUNTAIN: return {60, 55, 50};
-            case map_generator::BiomeType::SNOW: return {200, 210, 220};
+            // Вода: Синий (классический)
+            case map_generator::BiomeType::WATER: return {30, 140, 250};
+
+                // Песок: Светлый бежевый
+            case map_generator::BiomeType::SAND: return {240, 230, 140};
+
+                // Равнина: Светло-светло зеленый (самая низкая и светлая зелень)
+            case map_generator::BiomeType::PLAIN: return {46, 139, 87};
+
+                // Лес: Настоящий насыщенный зеленый (средняя высота)
+            case map_generator::BiomeType::FOREST: return {85, 107, 47};
+
+                // Холмы: Темно-зеленый (выше леса -> темнее)
+            case map_generator::BiomeType::HILLS: return {0, 82, 0};
+
+                // Болото: Коричневый / Грязно-бурый
+            case map_generator::BiomeType::SWAMP: return {0, 60, 40};
+
+                // Горы: Темно-серый (самая высокая и самая темная точка)
+            case map_generator::BiomeType::MOUNTAIN: return {100, 100, 100};
+
             default: return {255, 0, 255};
         }
     }
+
+    Color lerpColor(Color c1, Color c2, double t) const {
+        if (t < 0.0) t = 0.0;
+        if (t > 1.0) t = 1.0;
+
+        return {
+            static_cast<int>(c1.r + (c2.r - c1.r) * t),
+            static_cast<int>(c1.g + (c2.g - c1.g) * t),
+            static_cast<int>(c1.b + (c2.b - c1.b) * t)
+        };
+    }
+
+    enum class SurfaceType {
+    PLAIN,
+    FOREST,
+    WINTER_PLAIN,
+    WINTER_FOREST,
+
+    HILLS,
+    HILLY_JUNGLE,
+    WINTER_HILLS,
+    HILLY_WINTER_FOREST,
+
+    ROCKY_PEAKS,
+    SNOWY_ROCKS,
+
+    LAKE
+    };
+
+    Color getNaturalBiomeColor(SurfaceType type) const {
+        switch (type) {
+            case SurfaceType::PLAIN:               return {140, 190, 100};
+            case SurfaceType::FOREST:              return {20,  125,  40};
+            case SurfaceType::WINTER_PLAIN:        return {170, 200, 210};
+            case SurfaceType::WINTER_FOREST:       return {30,  110,  70};
+
+            case SurfaceType::HILLS:               return {115, 155,  80};
+            case SurfaceType::HILLY_JUNGLE:        return {10,  100,  30};
+            case SurfaceType::WINTER_HILLS:        return {140, 170, 185};
+            case SurfaceType::HILLY_WINTER_FOREST: return {22,   85,  55};
+
+            case SurfaceType::ROCKY_PEAKS:         return {77, 76, 76};
+            case SurfaceType::SNOWY_ROCKS:         return {228, 234, 243};
+
+            case SurfaceType::LAKE:                return {34,  120, 196};
+
+            default:                               return {255, 0, 255};
+        }
+    }
+
+    Color getNaturalColor(const map_generator::TerrainType& cell) const {
+        double temperature = cell.temperature;
+        double altitude    = cell.altitude;
+        double moisture    = cell.moisture;
+
+        SurfaceType type;
+
+        if (moisture > 0.95) {
+            type = SurfaceType::LAKE;
+        }
+        else if (altitude < 0.33) {
+            if (temperature > 0.50) {
+                if (moisture > 0.50) {
+                    type = SurfaceType::FOREST;
+                } else {
+                    type = SurfaceType::PLAIN;
+                }
+            } else {
+                if (moisture > 0.50) {
+                    type = SurfaceType::WINTER_FOREST;
+                } else {
+                    type = SurfaceType::WINTER_PLAIN;
+                }
+            }
+        }
+        else if (altitude < 0.75) {
+            if (temperature > 0.50) {
+                if (moisture > 0.50) {
+                    type = SurfaceType::HILLY_JUNGLE;
+                } else {
+                    type = SurfaceType::HILLS;
+                }
+            } else {
+                if (moisture > 0.50) {
+                    type = SurfaceType::HILLY_WINTER_FOREST;
+                } else {
+                    type = SurfaceType::WINTER_HILLS;
+                }
+            }
+        }
+        else {
+            if (temperature > 0.50) {
+                if (moisture > 0.50) {
+                    type = SurfaceType::ROCKY_PEAKS;
+                } else {
+                    type = SurfaceType::ROCKY_PEAKS;
+                }
+            } else {
+                if (moisture > 0.50) {
+                    type = SurfaceType::SNOWY_ROCKS;
+                } else {
+                    type = SurfaceType::ROCKY_PEAKS;
+                }
+            }
+        }
+
+        return getNaturalBiomeColor(type);
+    }
+
+
 
     Color getHeroPathColor(const Hero& hero) const {
 
         auto type = hero.getHeroType();
         
-        if (type == HeroType::Dwarf)    return {255, 165, 0};   // Оранжевый
-        if (type == HeroType::Wood_Elf) return {0, 255, 200};   // Циан
-        if (type == HeroType::Human)    return {220, 220, 220}; // Серебряный
+        if (type == HeroType::ORC)    return {255, 165, 0};   // Оранжевый
+        if (type == HeroType::WOOD_ELF) return {0, 255, 200};   // Циан
+        if (type == HeroType::HUMAN)    return {220, 220, 220}; // Серебряный
+        if (type == HeroType::GNOME)    return {255, 255, 255};
         
         return {255, 50, 50}; // Красный дефолт
     }
@@ -91,6 +215,7 @@ private:
         }
     }
 
+
 public:
     MapRenderer(const std::vector<std::vector<map_generator::TerrainType>>& map) {
         if (map.empty()) {
@@ -106,7 +231,8 @@ public:
         // Заполняем цветами биомов (делаем это 1 раз!)
         for (int y = 0; y < map_height; ++y) {
             for (int x = 0; x < map_width; ++x) {
-                map_basePixels[y][x] = getBiomeColor(map[y][x].biome);
+                // map_basePixels[y][x] = getBiomeColor(map[y][x].biome);
+                map_basePixels[y][x] = getNaturalColor(map[y][x]);
             }
         }
 

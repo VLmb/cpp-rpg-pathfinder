@@ -1,0 +1,10 @@
+D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/build/Desktop_Qt_6_10_0_MinGW_64_bit-Debug/CMakeFiles/edit_cache.dir
+D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/build/Desktop_Qt_6_10_0_MinGW_64_bit-Debug/CMakeFiles/rebuild_cache.dir
+D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/build/Desktop_Qt_6_10_0_MinGW_64_bit-Debug/core/CMakeFiles/CoreLogic.dir
+D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/build/Desktop_Qt_6_10_0_MinGW_64_bit-Debug/core/CMakeFiles/edit_cache.dir
+D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/build/Desktop_Qt_6_10_0_MinGW_64_bit-Debug/core/CMakeFiles/rebuild_cache.dir
+D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/build/Desktop_Qt_6_10_0_MinGW_64_bit-Debug/gui/CMakeFiles/MapPathfinderApp.dir
+D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/build/Desktop_Qt_6_10_0_MinGW_64_bit-Debug/gui/CMakeFiles/edit_cache.dir
+D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/build/Desktop_Qt_6_10_0_MinGW_64_bit-Debug/gui/CMakeFiles/rebuild_cache.dir
+D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/build/Desktop_Qt_6_10_0_MinGW_64_bit-Debug/gui/CMakeFiles/MapPathfinderApp_autogen_timestamp_deps.dir
+D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/build/Desktop_Qt_6_10_0_MinGW_64_bit-Debug/gui/CMakeFiles/MapPathfinderApp_autogen.dir

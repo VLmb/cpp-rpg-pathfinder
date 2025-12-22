@@ -29,6 +29,9 @@ public:
     GraphPathfinder(CheckpointGraph* graph, MapPathfinder* mapPathfinder) : graph(graph), mapPathfinder(mapPathfinder) {}
 
     PathWithTime findPath(const Point &start, const Point &goal, Hero &hero) {
+        if (!graph->pointIsVertex(start) || !graph->pointIsVertex(goal)) {
+            throw std::invalid_argument("Start and goal are invalid");
+        }
         return AStar::findPath(start, goal, hero, graph);
     }
 };

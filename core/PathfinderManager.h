@@ -44,12 +44,16 @@ public:
         }
 
         perlin = std::make_unique<Perlin2D>(seed);
-        auto map = map_generator::GenerateMap(width, height, perlin.get(), scale);
+        auto map = map_generator::generateMap(width, height, perlin.get(), scale);
         grid = std::make_unique<Grid>(map, map_generator::getGridScale(width, height));
         mapPathfinder = std::make_unique<MapPathfinder>(grid.get());
         graph = std::make_unique<CheckpointGraph>(width, height);
         graphPathfinder = std::make_unique<GraphPathfinder>( graph.get(), mapPathfinder.get());
         mapRenderer = std::make_unique<MapRenderer>(map);
+    }
+
+    void saveMapToFile(std::string fileName) {
+        mapRenderer->saveModifiedMap(fileName);
     }
 
     bool addVertexToCheckpointGraph(Point checkpoint) {
@@ -64,12 +68,24 @@ public:
         return true;
     }
 
+    bool addVertexToCheckpointGraph(int x, int y) {
+        return addVertexToCheckpointGraph(Point{x, y});
+    }
+
     bool addEdgeToCheckpointGraph(Point checkpoint1, Point checkpoint2) {
         return graph->addEdge(checkpoint1, checkpoint2);
     }
 
+    bool addEdgeToCheckpointGraph(int x1, int y1, int x2, int y2) {
+        return addEdgeToCheckpointGraph(Point{x1,y1}, Point{x2,y2});
+    }
+
     bool removeVertexFromCheckpointGraph(Point checkpoint) {
         return graph->removeVertex(checkpoint);
+    }
+
+    bool removeVertexFromCheckpointGraph(int x, int y) {
+        return graph->removeVertex(Point{x, y});
     }
 
     bool removeEdgeFromCheckpointGraph(Point checkpoint1, Point checkpoint2) {
@@ -88,14 +104,20 @@ public:
         return gridPath;
     }
 
-    void findPathAndDraw(Point checkpoint1, Point checkpoint2, Hero& hero, const std::string& fileName) {
-        auto path = findGridPath(checkpoint1, checkpoint2, hero);
+    double findPathAndDraw(Point checkpoint1, Point checkpoint2, Hero& hero, const std::string& fileName) {
+        auto pathWithTime = graphPathfinder->findPath(checkpoint1, checkpoint2, hero);
+        auto path = pathWithTime.path;
         mapRenderer->drawPath(
             path,
             hero,
             grid->getFactor()
             );
         mapRenderer->saveModifiedMap(fileName);
+        return pathWithTime.time;
+    }
+
+    double findPathAndDraw(int x1, int y1, int x2, int y2, Hero& hero, const std::string& fileName) {
+        return findPathAndDraw(Point{x1, y1}, Point{x2, y2}, hero, fileName);
     }
 
     void renderAndSaveCurrentMap(const std::string& fileName) const {

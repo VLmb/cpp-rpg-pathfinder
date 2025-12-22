@@ -53,8 +53,8 @@ public:
                 for (int dy = 0; dy < 3; ++dy) {
                     for (int dx = 0; dx < 3; ++dx) {
                         const auto& s = map[srcY + dy][srcX + dx];
-                        r += s.rockiness;
-                        v += s.vegetation;
+                        r += s.temperature;
+                        v += s.altitude;
                         m += s.moisture;
                     }
                 }

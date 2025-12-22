@@ -4,61 +4,64 @@
 #include <algorithm>
 #include <cmath>
 #include "Perlin2D.h"
+#include <iostream>
 
 namespace  map_generator {
 
     enum class BiomeType {
         WATER,
-        SAND,          // Бледный пляж / Пустошь
-        PLAIN,         // Темная трава / Равнина
-        FOREST,        // Лес
-        DENSE_FOREST,  // Густая чаща
-        SWAMP,         // Топи
-        MOUNTAIN,      // Скалы
-        SNOW           // Снег
+        SAND,
+        PLAIN,
+        HILLS,
+        FOREST,
+        SWAMP,
+        MOUNTAIN
     };
 
     struct TerrainType {
         int x;
         int y;
-        double rockiness;   // (R)
-        double vegetation;  // (V)
-        double moisture;    // (M)
+        double temperature;
+        double altitude;
+        double moisture;
         BiomeType biome;
     };
 
     // Логика определения биома
-    inline BiomeType GetBiome(double r, double v, double m) {
-        // 1. Уровень воды (объединили глубокую и обычную)
-        if (r < 0.30f) return BiomeType::WATER;
+    inline BiomeType getBiome(double e, double v, double m) {
 
-        // 2. Горы и Высокогорье
-        if (r > 0.75f) {
-            if (m > 0.75f) return BiomeType::SNOW;    // Снежные пики
-            return BiomeType::MOUNTAIN;               // Голые темные скалы
+        if (m > 0.75f) {
+            if (v > 0.60f) {
+                return BiomeType::SWAMP;
+            }
+            return BiomeType::WATER;
         }
 
-        // 3. Болота (Низменности с высокой влажностью)
-        // r < 0.55 гарантирует, что болота в низинах
-        if (m > 0.70f && r < 0.55f) return BiomeType::SWAMP;
+        if (e > 0.60f) {
+            if (v < 0.65f) {
+                return BiomeType::MOUNTAIN;
+            }
+            return BiomeType::HILLS;
+        }
 
-        // 4. Лесные массивы
-        if (v > 0.75f) return BiomeType::DENSE_FOREST; // Чаща
-        if (v > 0.45f) return BiomeType::FOREST;       // Обычный лес
+        if (m < 0.25f) {
+            return BiomeType::SAND;
+        }
 
-        // 5. Открытые пространства (мало растительности)
-        if (m < 0.30f) return BiomeType::SAND;         // Сухо = Песчаная пустошь
+        if (v > 0.50f) {
+            return BiomeType::FOREST;
+        }
 
-        // Дефолт: Равнина (Трава)
         return BiomeType::PLAIN;
+
     }
 
     inline constexpr double SIZE_T1 = 10.0;
     inline constexpr double SIZE_T2 = 30.0;
 
-    inline constexpr double SCALE_T1 = 40.0;
-    inline constexpr double SCALE_T2 = 80.0;
-    inline constexpr double SCALE_T3 = 100.0;
+    inline constexpr double SCALE_T1 = 45.0;
+    inline constexpr double SCALE_T2 = 90.0;
+    inline constexpr double SCALE_T3 = 120.0;
 
     inline constexpr int FACTOR_T1 = 4;
     inline constexpr int FACTOR_T2 = 3;
@@ -98,7 +101,7 @@ namespace  map_generator {
         return getGridScale(width, height) * GRID_FACTOR;
     }
 
-    inline std::vector<std::vector<TerrainType>> GenerateMap(const int width, const int height, Perlin2D* perlin, double scale = 0.0f) {
+    inline std::vector<std::vector<TerrainType>> generateMap(const int width, const int height, Perlin2D* perlin, double scale = 0.0f) {
         int modifiedWidth = width;
         int modifiedHeight = height;
 
@@ -107,48 +110,52 @@ namespace  map_generator {
         std::vector<std::vector<TerrainType>> map(modifiedHeight, std::vector<TerrainType>(modifiedWidth, TerrainType()));
 
         // Границы для нормализации
-        double minR = 1000.0f, maxR = -1000.0f;
-        double minV = 1000.0f, maxV = -1000.0f;
+        double minT = 1000.0f, maxT = -1000.0f;
+        double minA = 1000.0f, maxA = -1000.0f;
         double minM = 1000.0f, maxM = -1000.0f;
 
         const int OFFSET_R = 0;
-        const int OFFSET_V = 5200;
-        const int OFFSET_M = 13900;
+        const int OFFSET_V = 5500;
+        const int OFFSET_M = 12000;
 
         // --- ПРОХОД 1 ---
         for (int y = 0; y < modifiedHeight; y++) {
             for (int x = 0; x < modifiedWidth; x++) {
-                double rVal = perlin->Noise((x + OFFSET_R) / scale, (y + OFFSET_R) / scale, 4, 0.5f);
-                double vVal = perlin->Noise((x + OFFSET_V) / scale, (y + OFFSET_V) / scale, 3, 0.4f);
+                double tVal = perlin->Noise((x + OFFSET_R) / scale, (y + OFFSET_R) / scale, 3, 0.5f);
+                double aVal = perlin->Noise((x + OFFSET_V) / scale, (y + OFFSET_V) / scale, 4, 0.4f);
                 double mVal = perlin->Noise((x + OFFSET_M) / scale, (y + OFFSET_M) / scale, 2, 0.5f);
 
-                if (rVal < minR) minR = rVal; if (rVal > maxR) maxR = rVal;
-                if (vVal < minV) minV = vVal; if (vVal > maxV) maxV = vVal;
+                if (tVal < minT) minT = tVal; if (tVal > maxT) maxT = tVal;
+                if (aVal < minA) minA = aVal; if (aVal > maxA) maxA = aVal;
                 if (mVal < minM) minM = mVal; if (mVal > maxM) maxM = mVal;
 
-                map[y][x].rockiness = rVal;
-                map[y][x].vegetation = vVal;
+                map[y][x].temperature = tVal;
+                map[y][x].altitude = aVal;
                 map[y][x].moisture = mVal;
                 map[y][x].x = x;
                 map[y][x].y = y;
             }
         }
 
-        if (maxR == minR) maxR += 0.001f;
-        if (maxV == minV) maxV += 0.001f;
+        if (maxT == minT) maxT += 0.001f;
+        if (maxA == minA) maxA += 0.001f;
         if (maxM == minM) maxM += 0.001f;
+
+        std::cout << "min and max V " << minA<< ", " << maxA << ", " << std::endl;
+        std::cout << "min and max R " << minT<< ", " << maxT << ", " << std::endl;
+        std::cout << "min and max M " << minM<< ", " << maxM << ", " << std::endl;
 
         // --- ПРОХОД 2 ---
         for (int y = 0; y < modifiedHeight; y++) {
             for (int x = 0; x < modifiedWidth; x++) {
-                double nR = (map[y][x].rockiness - minR) / (maxR - minR);
-                double nV = (map[y][x].vegetation - minV) / (maxV - minV);
+                double nR = (map[y][x].temperature - minT) / (maxT - minT);
+                double nV = (map[y][x].altitude - minA) / (maxA - minA);
                 double nM = (map[y][x].moisture - minM) / (maxM - minM);
 
-                map[y][x].rockiness = nR;
-                map[y][x].vegetation = nV;
+                map[y][x].temperature = nR;
+                map[y][x].altitude = nV;
                 map[y][x].moisture = nM;
-                map[y][x].biome = GetBiome(nR, nV, nM);
+                map[y][x].biome = getBiome(nR, nV, nM);
             }
         }
         return map;
