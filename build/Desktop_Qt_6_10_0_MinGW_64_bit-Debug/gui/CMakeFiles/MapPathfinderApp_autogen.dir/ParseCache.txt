@@ -186,6 +186,7 @@ D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/gui/mainwindow
  mdp:D:/Apps/QT/6.10.0/mingw_64/include/QtGui/qwindowdefs.h
  mdp:D:/Apps/QT/6.10.0/mingw_64/include/QtGui/qwindowdefs_win.h
  mdp:D:/Apps/QT/6.10.0/mingw_64/include/QtWidgets/QGraphicsPixmapItem
+ mdp:D:/Apps/QT/6.10.0/mingw_64/include/QtWidgets/QGraphicsRectItem
  mdp:D:/Apps/QT/6.10.0/mingw_64/include/QtWidgets/QGraphicsScene
  mdp:D:/Apps/QT/6.10.0/mingw_64/include/QtWidgets/QMainWindow
  mdp:D:/Apps/QT/6.10.0/mingw_64/include/QtWidgets/qgraphicsitem.h

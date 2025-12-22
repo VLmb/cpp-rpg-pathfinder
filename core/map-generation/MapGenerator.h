@@ -59,9 +59,9 @@ namespace  map_generator {
     inline constexpr double SIZE_T1 = 10.0;
     inline constexpr double SIZE_T2 = 30.0;
 
-    inline constexpr double SCALE_T1 = 45.0;
-    inline constexpr double SCALE_T2 = 90.0;
-    inline constexpr double SCALE_T3 = 120.0;
+    inline constexpr double SCALE_T1 = 50.0;
+    inline constexpr double SCALE_T2 = 100.0;
+    inline constexpr double SCALE_T3 = 150.0;
 
     inline constexpr int FACTOR_T1 = 4;
     inline constexpr int FACTOR_T2 = 3;

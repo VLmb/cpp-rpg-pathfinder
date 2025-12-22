@@ -56,6 +56,13 @@
        </widget>
       </item>
       <item>
+             <widget class="QPushButton" name="btnRemoveEdge">
+              <property name="text">
+               <string>Удалить связь</string>
+              </property>
+             </widget>
+            </item>
+      <item>
        <widget class="QPushButton" name="btnFindPath">
         <property name="text">
          <string>Найти путь</string>

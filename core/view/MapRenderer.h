@@ -162,10 +162,10 @@ private:
 
         auto type = hero.getHeroType();
         
-        if (type == HeroType::ORC)    return {255, 165, 0};   // Оранжевый
-        if (type == HeroType::WOOD_ELF) return {0, 255, 200};   // Циан
-        if (type == HeroType::HUMAN)    return {220, 220, 220}; // Серебряный
-        if (type == HeroType::GNOME)    return {255, 255, 255};
+        if (type == HeroType::ORC)    return {199, 21, 133};
+        if (type == HeroType::WOOD_ELF) return {255, 0, 0};
+        if (type == HeroType::HUMAN)    return {0, 0, 255};
+        if (type == HeroType::GNOME)    return {0, 0, 0};
         
         return {255, 50, 50}; // Красный дефолт
     }
@@ -201,7 +201,7 @@ private:
     void drawPathCell(std::vector<std::vector<Color>>& buffer, int gridX, int gridY, int factor, Color color) const {
         int startX = gridX * factor;
         int startY = gridY * factor;
-        float alpha = 0.6f; // Прозрачность пути
+        float alpha = 0.5f; // Прозрачность пути
 
         for (int dy = 0; dy < factor; ++dy) {
             for (int dx = 0; dx < factor; ++dx) {
@@ -265,8 +265,9 @@ public:
         int vertexSize
     ) {
         Color borderColor = {255, 0, 0};
-        Color centerColor = {255, 165, 0};
+        Color centerColor = {255, 255, 0};
 
+        // Incoming point is in grid coordinates; convert to pixel space.
         int startX = vertice.x;
         int startY = vertice.y;
 
@@ -285,6 +286,25 @@ public:
                     } else {
                         map_modifiedPixels[py][px] = centerColor;
                     }
+                }
+            }
+        }
+    }
+
+    void undrawGraphVertices(
+        const Point vertice,
+        int vertexSize
+    ) {
+        int startX = vertice.x;
+        int startY = vertice.y;
+
+        for (int dy = 0; dy < vertexSize; ++dy) {
+            for (int dx = 0; dx < vertexSize; ++dx) {
+                int px = startX + dx;
+                int py = startY + dy;
+
+                if (px >= 0 && px < map_width && py >= 0 && py < map_height) {
+                    map_modifiedPixels[py][px] = map_basePixels[py][px];
                 }
             }
         }

@@ -73,20 +73,20 @@ public:
 
 class WoodElf : public Hero {
 public:
-    WoodElf() : Hero(120, 1.0, 3.0f, 1.0f, 12.0f, HeroType::WOOD_ELF) {}  // rock, veget, moister
+    WoodElf() : Hero(120, 1.0, 1.0f, 30.0f, 100.0f, HeroType::WOOD_ELF) {}  // rock, veget, moister
 };
 
 class Orc : public Hero {
 public:
-    Orc() : Hero(150, 1.0, 12.0f, 3.0f, 1.0f, HeroType::ORC) {}  // rock, veget, moister
+    Orc() : Hero(150, 1.0, 100.0f, 1.0f, 1.0f, HeroType::ORC) {}  // rock, veget, moister
 };
 
 class Gnome : public Hero {
 public:
-    Gnome(): Hero(150, 1.0, 100.0f, 1.0f, 1000.0f, HeroType::ORC) {}
+    Gnome(): Hero(150, 1.0, 1.0f, 100.0f, 50.0f, HeroType::ORC) {}
 };
 
 class Human : public Hero {
 public:
-    Human() : Hero(100, 5.0f, 5.0f, 5.0f, 1.0f, HeroType::HUMAN) {}  // rock, veget, moister
+    Human() : Hero(100, 5.0f, 50.0f, 50.0f, 50.0f, HeroType::HUMAN) {}  // rock, veget, moister
 };

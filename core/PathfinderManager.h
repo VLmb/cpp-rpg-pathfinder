@@ -16,6 +16,17 @@ private:
     std::unique_ptr<MapPathfinder> mapPathfinder;
     std::unique_ptr<GraphPathfinder> graphPathfinder;
     std::unique_ptr<MapRenderer> mapRenderer;
+
+    std::string fileName;
+
+    int getMultiplier(Point checkpoint) {
+        return map_generator::getMultFromCheckpointToPixels(graph->getWidth(), graph->getHeight());
+    }
+
+    Point getMappedPixelsCoordinate(Point checkpoint) {
+        int multiplier = getMultiplier(checkpoint);
+        return Point{checkpoint.x * multiplier, checkpoint.y * multiplier};
+    }
 public:
     PathfinderManager(
         std::unique_ptr<Grid> grid,
@@ -23,19 +34,21 @@ public:
         std::unique_ptr<Perlin2D> perlin,
         std::unique_ptr<MapPathfinder> mapPathfinder,
         std::unique_ptr<GraphPathfinder> graphPathfinder,
-        std::unique_ptr<MapRenderer> mapRenderer
+        std::unique_ptr<MapRenderer> mapRenderer,
+        const std::string& filename
         )
     : grid(std::move(grid)),
     graph(std::move(graph)),
     perlin(std::move(perlin)),
     mapPathfinder(std::move(mapPathfinder)),
+    fileName(filename),
     graphPathfinder(std::move(graphPathfinder)
     ) {
         this->mapRenderer = std::move(mapRenderer);
     }
 
     PathfinderManager(
-        int width, int height,
+        int width, int height, const std::string& filename,
         double scale = 0.0f, int seed = 12345) {
 
         if (width < 5 && height < 5 && scale < 0.0f
@@ -50,9 +63,11 @@ public:
         graph = std::make_unique<CheckpointGraph>(width, height);
         graphPathfinder = std::make_unique<GraphPathfinder>( graph.get(), mapPathfinder.get());
         mapRenderer = std::make_unique<MapRenderer>(map);
+
+        fileName = filename;
     }
 
-    void saveMapToFile(std::string fileName) {
+    void saveMapToFile() {
         mapRenderer->saveModifiedMap(fileName);
     }
 
@@ -60,11 +75,11 @@ public:
         if (!graph->addVertex(checkpoint)) {
             return false;
         }
-        int multiplier = map_generator::getMultFromCheckpointToPixels(graph->getWidth(), graph->getHeight());
         mapRenderer->drawGraphVertices(
-            Point{checkpoint.x * multiplier, checkpoint.y * multiplier},
-            multiplier
+            getMappedPixelsCoordinate(checkpoint),
+            getMultiplier(checkpoint)
         );
+        mapRenderer->saveModifiedMap(fileName);
         return true;
     }
 
@@ -81,15 +96,37 @@ public:
     }
 
     bool removeVertexFromCheckpointGraph(Point checkpoint) {
-        return graph->removeVertex(checkpoint);
+        bool f = graph->removeVertex(checkpoint);
+        mapRenderer->undrawGraphVertices(
+            getMappedPixelsCoordinate(checkpoint),
+            getMultiplier(checkpoint)
+            );
+        mapRenderer->saveModifiedMap(fileName);
+        return f;
     }
 
     bool removeVertexFromCheckpointGraph(int x, int y) {
-        return graph->removeVertex(Point{x, y});
+        return removeVertexFromCheckpointGraph(Point{x, y});
     }
 
     bool removeEdgeFromCheckpointGraph(Point checkpoint1, Point checkpoint2) {
-        return graph->removeEdge(checkpoint1, checkpoint2);
+        bool f = graph->removeEdge(checkpoint1, checkpoint2);
+        f = graph->removeVertex(checkpoint1);
+        mapRenderer->undrawGraphVertices(
+            getMappedPixelsCoordinate(checkpoint1),
+            getMultiplier(checkpoint1)
+            );
+        f = graph->removeVertex(checkpoint1);
+        mapRenderer->undrawGraphVertices(
+            getMappedPixelsCoordinate(checkpoint2),
+            getMultiplier(checkpoint2)
+            );
+        mapRenderer->saveModifiedMap(fileName);
+        return f;
+    }
+
+    bool removeEdgeFromCheckpointGraph(int x1, int y1, int x2, int y2) {
+        return removeEdgeFromCheckpointGraph(Point{x1,y1}, Point{x2,y2});
     }
 
     std::vector<Point> findGridPath(Point checkpoint1, Point checkpoint2, Hero& hero) {
@@ -104,11 +141,12 @@ public:
         return gridPath;
     }
 
-    double findPathAndDraw(Point checkpoint1, Point checkpoint2, Hero& hero, const std::string& fileName) {
+    double findPathAndDraw(Point checkpoint1, Point checkpoint2, Hero& hero) {
         auto pathWithTime = graphPathfinder->findPath(checkpoint1, checkpoint2, hero);
         auto path = pathWithTime.path;
+        auto gridPath = mapPathfinder->makeGridPathFromCheckpointsPath(path, hero);
         mapRenderer->drawPath(
-            path,
+            gridPath,
             hero,
             grid->getFactor()
             );
@@ -116,8 +154,8 @@ public:
         return pathWithTime.time;
     }
 
-    double findPathAndDraw(int x1, int y1, int x2, int y2, Hero& hero, const std::string& fileName) {
-        return findPathAndDraw(Point{x1, y1}, Point{x2, y2}, hero, fileName);
+    double findPathAndDraw(int x1, int y1, int x2, int y2, Hero& hero) {
+        return findPathAndDraw(Point{x1, y1}, Point{x2, y2}, hero);
     }
 
     void renderAndSaveCurrentMap(const std::string& fileName) const {
