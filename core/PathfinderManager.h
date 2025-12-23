@@ -120,32 +120,32 @@ public:
         return removeEdgeFromCheckpointGraph(Point{x1,y1}, Point{x2,y2});
     }
 
-    std::vector<Point> findGridPath(Point checkpoint1, Point checkpoint2, Hero& hero) {
+    std::vector<Point> findGridPath(Point checkpoint1, Point checkpoint2, Hero& hero, bool castTerrain = false) {
         if (!graph->pointIsVertex(checkpoint1) || !graph->pointIsVertex(checkpoint2)) {
             throw std::invalid_argument("Checkpoint graph does not have such vertex.");
         }
 
-        auto pathWithTime = graphPathfinder->findPath(checkpoint1, checkpoint2, hero);
+        auto pathWithTime = graphPathfinder->findPath(checkpoint1, checkpoint2, hero, castTerrain);
 
         auto gridPath = mapPathfinder->makeGridPathFromCheckpointsPath(pathWithTime.path, hero);
 
         return gridPath;
     }
 
-    double findPathAndDraw(Point checkpoint1, Point checkpoint2, Hero& hero) {
-        auto pathWithTime = graphPathfinder->findPath(checkpoint1, checkpoint2, hero);
+    double findPathAndDraw(Point checkpoint1, Point checkpoint2, Hero& hero, bool castTerrain = false) {
+        auto pathWithTime = graphPathfinder->findPath(checkpoint1, checkpoint2, hero, castTerrain);
         auto path = pathWithTime.path;
         auto gridPath = mapPathfinder->makeGridPathFromCheckpointsPath(path, hero);
         mapRenderer->drawPath(
             gridPath,
             hero,
-            grid->getFactor()
+            grid->getGridFactor()
             );
         mapRenderer->saveModifiedMap(fileName);
         return pathWithTime.time;
     }
 
-    double findPathAndDraw(int x1, int y1, int x2, int y2, Hero& hero) {
+    double findPathAndDraw(int x1, int y1, int x2, int y2, Hero& hero, bool castTerrain = false) {
         return findPathAndDraw(Point{x1, y1}, Point{x2, y2}, hero);
     }
 
@@ -177,4 +177,9 @@ public:
             );
         }
     }
+
+    void printGridDigit() {
+        grid->printCells();
+    }
+
 };

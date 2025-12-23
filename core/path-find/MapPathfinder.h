@@ -45,7 +45,10 @@ private:
     Grid* grid;
     HashMap<PathKey, PathWithTime, PathKeyHash, PathKeyEq> pathCache;
 
-    double getStepTime(Point cur, Point next, Hero& hero) const override {
+    double getStepTime(Point cur, Point next, Hero& hero, bool castTerrain = false) const override {
+        if (castTerrain) {
+            return hero.getTimeToCrossCastTerrain(grid->getCellType(next.x, next.y));
+        }
         return hero.getTimeToCross(grid->getCellType(next.x, next.y));
     }
 
@@ -59,7 +62,7 @@ public:
         };
     }
 
-    PathWithTime findPath(const Point& start, const Point& goal, Hero& hero) {
+    PathWithTime findPath(const Point& start, const Point& goal, Hero& hero, bool castTerrain = false) {
         if (auto* cached = pathCache.getPtr({ start, goal, &hero })) {
             return *cached;
         }

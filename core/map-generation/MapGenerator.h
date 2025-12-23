@@ -9,51 +9,113 @@
 namespace  map_generator {
 
     enum class BiomeType {
-        WATER,
-        SAND,
         PLAIN,
-        HILLS,
         FOREST,
-        SWAMP,
-        MOUNTAIN
+        WINTER_PLAIN,
+        WINTER_FOREST,
+
+        HILLS,
+        HILLY_JUNGLE,
+        WINTER_HILLS,
+        HILLY_WINTER_FOREST,
+
+        ROCKY_PEAKS,
+        SNOWY_ROCKS
     };
 
     struct TerrainType {
         int x;
         int y;
+
         double temperature;
         double altitude;
         double moisture;
+
+        double castTemperature;
+        double castAltitude;
+        double castMoisture;
+
         BiomeType biome;
     };
 
+    inline double getCastTemperature(double temperature) {
+        if (temperature > 0.50) {
+            return 0.9;
+        }
+        return 0.1;
+    }
+
+    inline double getCastAltitude(double altitude) {
+        if (altitude < 0.33) {
+            return 0.1;
+        }
+        if (altitude < 0.75) {
+            return 0.5;
+        }
+        return 0.9;
+    }
+
+    inline double getCastMoisture(double moisture) {
+        if (moisture > 0.5) {
+            return 0.9;
+        }
+        return 0.1;
+    }
+
     // Логика определения биома
-    inline BiomeType getBiome(double e, double v, double m) {
+    inline BiomeType getBiomeType(
+        double temperature,
+        double altitude,
+        double moisture) {
 
-        if (m > 0.75f) {
-            if (v > 0.60f) {
-                return BiomeType::SWAMP;
+        BiomeType type;
+
+         if (altitude < 0.33) {
+            if (temperature > 0.50) {
+                if (moisture > 0.50) {
+                    type = BiomeType::FOREST;
+                } else {
+                    type = BiomeType::PLAIN;
+                }
+            } else {
+                if (moisture > 0.50) {
+                    type = BiomeType::WINTER_FOREST;
+                } else {
+                    type = BiomeType::WINTER_PLAIN;
+                }
             }
-            return BiomeType::WATER;
         }
-
-        if (e > 0.60f) {
-            if (v < 0.65f) {
-                return BiomeType::MOUNTAIN;
+        else if (altitude < 0.75) {
+            if (temperature > 0.50) {
+                if (moisture > 0.50) {
+                    type = BiomeType::HILLY_JUNGLE;
+                } else {
+                    type = BiomeType::HILLS;
+                }
+            } else {
+                if (moisture > 0.50) {
+                    type = BiomeType::HILLY_WINTER_FOREST;
+                } else {
+                    type = BiomeType::WINTER_HILLS;
+                }
             }
-            return BiomeType::HILLS;
         }
-
-        if (m < 0.25f) {
-            return BiomeType::SAND;
+        else {
+            if (temperature > 0.50) {
+                if (moisture > 0.50) {
+                    type = BiomeType::ROCKY_PEAKS;
+                } else {
+                    type = BiomeType::ROCKY_PEAKS;
+                }
+            } else {
+                if (moisture > 0.75) {
+                    type = BiomeType::SNOWY_ROCKS;
+                } else {
+                    type = BiomeType::ROCKY_PEAKS;
+                }
+            }
         }
-
-        if (v > 0.50f) {
-            return BiomeType::FOREST;
-        }
-
-        return BiomeType::PLAIN;
-
+        return type;
     }
 
     inline constexpr double SIZE_T1 = 10.0;
@@ -122,7 +184,7 @@ namespace  map_generator {
         for (int y = 0; y < modifiedHeight; y++) {
             for (int x = 0; x < modifiedWidth; x++) {
                 double tVal = perlin->Noise((x + OFFSET_R) / scale, (y + OFFSET_R) / scale, 3, 0.5f);
-                double aVal = perlin->Noise((x + OFFSET_V) / scale, (y + OFFSET_V) / scale, 4, 0.4f);
+                double aVal = perlin->Noise((x + OFFSET_V) / scale, (y + OFFSET_V) / scale, 5, 0.4f);
                 double mVal = perlin->Noise((x + OFFSET_M) / scale, (y + OFFSET_M) / scale, 2, 0.5f);
 
                 if (tVal < minT) minT = tVal; if (tVal > maxT) maxT = tVal;
@@ -148,14 +210,17 @@ namespace  map_generator {
         // --- ПРОХОД 2 ---
         for (int y = 0; y < modifiedHeight; y++) {
             for (int x = 0; x < modifiedWidth; x++) {
-                double nR = (map[y][x].temperature - minT) / (maxT - minT);
-                double nV = (map[y][x].altitude - minA) / (maxA - minA);
+                double nT = (map[y][x].temperature - minT) / (maxT - minT);
+                double nA = (map[y][x].altitude - minA) / (maxA - minA);
                 double nM = (map[y][x].moisture - minM) / (maxM - minM);
 
-                map[y][x].temperature = nR;
-                map[y][x].altitude = nV;
+                map[y][x].temperature = nT;
+                map[y][x].altitude = nA;
                 map[y][x].moisture = nM;
-                map[y][x].biome = getBiome(nR, nV, nM);
+                map[y][x].biome = getBiomeType(nT, nA, nM);
+                map[y][x].castAltitude = getCastAltitude(nA);
+                map[y][x].castTemperature = getCastTemperature(nT);
+                map[y][x].castMoisture = getCastTemperature(nM);
             }
         }
         return map;

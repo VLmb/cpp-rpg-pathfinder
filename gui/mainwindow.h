@@ -41,7 +41,8 @@ private slots:
     void on_btnAddEdge_clicked();
     void on_btnClearMap_clicked();
     void on_btnRemoveEdge_clicked();
-    void on_btnFindPath_clicked();
+    void on_btnFindPathNatural_clicked();
+    void on_btnFindPathCast_clicked();
     void on_comboHero_currentIndexChanged(int index);
 
 private:
@@ -52,6 +53,8 @@ private:
 
     PathfinderManager *manager;
     Hero *currentHero;
+
+    bool isCastMode;
 
     int userGridWidth;
     int userGridHeight;

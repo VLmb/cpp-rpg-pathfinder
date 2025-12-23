@@ -70,12 +70,19 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btnFindPath">
-        <property name="text">
-         <string>Найти путь</string>
-        </property>
-       </widget>
-      </item>
+             <widget class="QPushButton" name="btnFindPathNatural">
+              <property name="text">
+               <string>Найти путь (Natural)</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btnFindPathCast">
+              <property name="text">
+               <string>Найти путь (Cast)</string>
+              </property>
+             </widget>
+            </item>
       <item>
        <widget class="QLabel" name="lblStatus">
         <property name="text">

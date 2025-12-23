@@ -35,7 +35,14 @@ int main() {
     Gnome gnome;
     //
     // manager.findPathAndDraw(a,e,human,"test.ppm");
-    manager.findPathAndDraw(a,e,gnome);
+    auto t1 = manager.findPathAndDraw(a,e,gnome);
+    auto t2 = manager.findPathAndDraw(a,e,gnome, true);
+    std::cout << t1 << " " << t2 << std::endl;
+
+    PathfinderManager manager2(10, 10, filename);
+    manager2.printGridDigit();
+
+
     //
     // manager.renderAndSaveCurrentMap("map3.ppm");
 }

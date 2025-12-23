@@ -36,7 +36,8 @@ public:
     QPushButton *btnAddEdge;
     QPushButton *btnRemoveEdge;
     QPushButton *btnClearMap;
-    QPushButton *btnFindPath;
+    QPushButton *btnFindPathNatural;
+    QPushButton *btnFindPathCast;
     QLabel *lblStatus;
     QSpacerItem *verticalSpacer;
     QGraphicsView *mapView;
@@ -83,10 +84,15 @@ public:
 
         verticalLayout->addWidget(btnClearMap);
 
-        btnFindPath = new QPushButton(centralwidget);
-        btnFindPath->setObjectName("btnFindPath");
+        btnFindPathNatural = new QPushButton(centralwidget);
+        btnFindPathNatural->setObjectName("btnFindPathNatural");
 
-        verticalLayout->addWidget(btnFindPath);
+        verticalLayout->addWidget(btnFindPathNatural);
+
+        btnFindPathCast = new QPushButton(centralwidget);
+        btnFindPathCast->setObjectName("btnFindPathCast");
+
+        verticalLayout->addWidget(btnFindPathCast);
 
         lblStatus = new QLabel(centralwidget);
         lblStatus->setObjectName("lblStatus");
@@ -134,7 +140,8 @@ public:
         btnAddEdge->setText(QCoreApplication::translate("MainWindow", "\320\224\320\276\320\261\320\260\320\262\320\270\321\202\321\214 \321\201\320\262\321\217\320\267\321\214", nullptr));
         btnRemoveEdge->setText(QCoreApplication::translate("MainWindow", "\320\243\320\264\320\260\320\273\320\270\321\202\321\214 \321\201\320\262\321\217\320\267\321\214", nullptr));
         btnClearMap->setText(QCoreApplication::translate("MainWindow", "\320\236\321\207\320\270\321\201\321\202\320\270\321\202\321\214 \320\272\320\260\321\200\321\202\321\203", nullptr));
-        btnFindPath->setText(QCoreApplication::translate("MainWindow", "\320\235\320\260\320\271\321\202\320\270 \320\277\321\203\321\202\321\214", nullptr));
+        btnFindPathNatural->setText(QCoreApplication::translate("MainWindow", "\320\235\320\260\320\271\321\202\320\270 \320\277\321\203\321\202\321\214 (Natural)", nullptr));
+        btnFindPathCast->setText(QCoreApplication::translate("MainWindow", "\320\235\320\260\320\271\321\202\320\270 \320\277\321\203\321\202\321\214 (Cast)", nullptr));
         lblStatus->setText(QCoreApplication::translate("MainWindow", "\320\241\321\202\320\260\321\202\321\203\321\201: \320\236\320\266\320\270\320\264\320\260\320\275\320\270\320\265", nullptr));
     } // retranslateUi
 
