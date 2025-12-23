@@ -26,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
       , cellStepX(1.0)
       , cellStepY(1.0)
       , currentState(AppState::IDLE)
-      , isCastMode(false) // Инициализация флага
+      , isCastMode(false)
 {
     ui->setupUi(this);
 
@@ -40,25 +40,25 @@ MainWindow::MainWindow(QWidget *parent)
     ui->mapView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->mapView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-           // === ЗАПОЛНЕНИЕ СПИСКА ГЕРОЕВ ИЗ КОДА ===
-    ui->comboHero->clear(); // Удаляем то, что было в .ui файле
-    ui->comboHero->addItem(""); // Индекс 0 - Пустой выбор
+           // === ЗАПОЛНЕНИЕ СПИСКА ГЕРОЕВ ===
+    ui->comboHero->clear();
+    ui->comboHero->addItem("");
 
-           // Создаем временные объекты, чтобы узнать их имена
     Human tempHuman;
-    ui->comboHero->addItem(QString::fromStdString(tempHuman.getHeroName())); // Индекс 1
+    ui->comboHero->addItem(QString::fromStdString(tempHuman.getHeroName()));
 
     WoodElf tempElf;
-    ui->comboHero->addItem(QString::fromStdString(tempElf.getHeroName()));   // Индекс 2
+    ui->comboHero->addItem(QString::fromStdString(tempElf.getHeroName()));
 
     Orc tempOrc;
-    ui->comboHero->addItem(QString::fromStdString(tempOrc.getHeroName()));   // Индекс 3
+    ui->comboHero->addItem(QString::fromStdString(tempOrc.getHeroName()));
 
     Gnome tempGnome;
-    ui->comboHero->addItem(QString::fromStdString(tempGnome.getHeroName())); // Индекс 4
+    ui->comboHero->addItem(QString::fromStdString(tempGnome.getHeroName()));
 
-           // Выбираем пустой элемент по умолчанию
     ui->comboHero->setCurrentIndex(0);
+
+    setupLegend();
 
     ui->lblStatus->setText("Готово к работе. Сгенерируйте карту.");
 }
@@ -179,6 +179,7 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
             if (!manager) return false;
 
             QMouseEvent *me = static_cast<QMouseEvent*>(event);
+            // Исправлено предупреждение globalPos -> globalPosition().toPoint()
             QPointF scenePos = ui->mapView->mapToScene(me->pos());
 
             int gridX = static_cast<int>(scenePos.x() / cellStepX);
@@ -194,7 +195,7 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
                 case AppState::IDLE:
                     ui->lblStatus->setText(QString("Выбрана клетка: %1, %2").arg(gridX).arg(gridY));
                     if (me->button() == Qt::RightButton) {
-                        showContextMenu(me->globalPos(), gridX, gridY);
+                        showContextMenu(me->globalPosition().toPoint(), gridX, gridY);
                     }
                     break;
 
@@ -241,7 +242,6 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
                     try {
                         if (!currentHero) throw std::runtime_error("Герой не выбран!");
 
-                               // Передаем флаг isCastMode последним параметром
                         double time = manager->findPathAndDraw(
                                 tempPoint1.x(), tempPoint1.y(),
                                 gridX, gridY,
@@ -253,7 +253,6 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
                             QMessageBox::warning(this, "Нет пути", "Не существует пути между этими вершинами!");
                             ui->lblStatus->setText("Путь не найден (бесконечность).");
                         } else {
-                            // Получаем имя героя и режим
                             QString heroName = QString::fromStdString(currentHero->getHeroName());
                             QString timeStr = QString::number(time, 'f', 2);
                             QString modeStr = isCastMode ? "(Cast)" : "(Natural)";
@@ -318,16 +317,19 @@ void MainWindow::showContextMenu(const QPoint &screenPos, int gridX, int gridY)
     }
 }
 
-// === Кнопки ===
+// === КНОПКИ ГЕНЕРАЦИИ ===
 
-void MainWindow::on_btnGenerate_clicked()
+// Новая функция, которая содержит общую логику диалога
+void MainWindow::runGenerationDialog(bool isCast)
 {
     QDialog dialog(this);
-    dialog.setWindowTitle("Параметры");
+    QString title = isCast ? "Параметры генерации (Cast)" : "Параметры генерации (Natural)";
+    dialog.setWindowTitle(title);
+
     QFormLayout form(&dialog);
 
-    QSpinBox *spinW = new QSpinBox(&dialog); spinW->setRange(2, 2000); spinW->setValue(30);
-    QSpinBox *spinH = new QSpinBox(&dialog); spinH->setRange(2, 2000); spinH->setValue(20);
+    QSpinBox *spinW = new QSpinBox(&dialog); spinW->setRange(2, 2000); spinW->setValue(40);
+    QSpinBox *spinH = new QSpinBox(&dialog); spinH->setRange(2, 2000); spinH->setValue(30);
 
     QDoubleSpinBox *spinScale = new QDoubleSpinBox(&dialog);
     spinScale->setRange(0.0, 500.0);
@@ -353,14 +355,35 @@ void MainWindow::on_btnGenerate_clicked()
         userGridHeight = spinH->value();
         float scaleVal = static_cast<float>(spinScale->value());
 
-        manager = new PathfinderManager(userGridWidth, userGridHeight, mapFileName, scaleVal, spinSeed->value());
-        manager->saveMapToFile();
+               // ВЫЗОВ КОНСТРУКТОРА С НОВЫМ ПАРАМЕТРОМ isCast
+        manager = new PathfinderManager(
+                userGridWidth,
+                userGridHeight,
+                mapFileName,
+                isCast, // <--- Передаем сюда флаг
+                scaleVal,
+                spinSeed->value()
+                );
 
+        manager->saveMapToFile();
         reloadMapImage();
 
-        ui->lblStatus->setText("Карта сгенерирована.");
+        QString modeStr = isCast ? "(Cast)" : "(Natural)";
+        ui->lblStatus->setText("Карта сгенерирована " + modeStr);
     }
 }
+
+// Слоты для кнопок просто вызывают общую функцию с разными параметрами
+void MainWindow::on_btnGenerateNatural_clicked()
+{
+    runGenerationDialog(false);
+}
+
+void MainWindow::on_btnGenerateCast_clicked()
+{
+    runGenerationDialog(true);
+}
+// ==========================
 
 void MainWindow::on_btnAddEdge_clicked()
 {
@@ -376,13 +399,10 @@ void MainWindow::on_btnClearMap_clicked()
         return;
     }
 
-           // Вызываем метод очистки в менеджере
     manager->cleanMap();
-
     manager->drawAllCheckpoints();
     manager->saveMapToFile();
 
-           // Перерисовываем картинку
     reloadMapImage();
 
     ui->lblStatus->setText("Карта очищена (пути и вершины сброшены).");
@@ -395,7 +415,7 @@ void MainWindow::on_btnRemoveEdge_clicked()
     ui->lblStatus->setText("Удаление связи: выберите первую вершину");
 }
 
-// === НОВЫЕ СЛОТЫ ДЛЯ ПОИСКА ПУТИ ===
+// === КНОПКИ ПОИСКА ПУТИ ===
 
 void MainWindow::on_btnFindPathNatural_clicked()
 {
@@ -404,7 +424,7 @@ void MainWindow::on_btnFindPathNatural_clicked()
         QMessageBox::warning(this, "Герой", "Сначала выберите героя из списка!");
         return;
     }
-    isCastMode = false; // Режим Natural
+    isCastMode = false;
     currentState = AppState::SELECTING_PATH_1;
     ui->lblStatus->setText("Поиск (Natural): выберите старт");
 }
@@ -416,7 +436,7 @@ void MainWindow::on_btnFindPathCast_clicked()
         QMessageBox::warning(this, "Герой", "Сначала выберите героя из списка!");
         return;
     }
-    isCastMode = true; // Режим Cast
+    isCastMode = true;
     currentState = AppState::SELECTING_PATH_1;
     ui->lblStatus->setText("Поиск (Cast): выберите старт");
 }
@@ -435,7 +455,6 @@ void MainWindow::on_comboHero_currentIndexChanged(int index)
         currentHero = nullptr;
     }
 
-           // Индекс 0 = "", Индексы 1..4 = Герои
     switch (index) {
         case 0: currentHero = nullptr; break;
         case 1: currentHero = new Human(); break;
@@ -446,10 +465,57 @@ void MainWindow::on_comboHero_currentIndexChanged(int index)
     }
 
     if (currentHero) {
-        // Берем имя уже из созданного объекта
         QString heroName = QString::fromStdString(currentHero->getHeroName());
         ui->lblStatus->setText("Герой выбран: " + heroName);
     } else {
         ui->lblStatus->setText("Герой не выбран");
+    }
+}
+
+void MainWindow::setupLegend()
+{
+    struct BiomeData {
+        QString name;
+        QColor color;
+    };
+
+    std::vector<BiomeData> biomes = {
+            {"Равнина",               QColor(135, 171, 104)},
+            {"Лес",                   QColor(20, 120, 40)},
+            {"Морозная Равнина",      QColor(104, 171, 144)},
+            {"Зимний лес",            QColor(18, 127, 91)},
+            {"Ветренные Холмы",       QColor(102, 130, 79)},
+            {"Лесистые Холмы",        QColor(8, 73, 22)},
+            {"Холодные Холмы",        QColor(72, 116, 98)},
+            {"Зимний Бор На Холмах",  QColor(9, 65, 46)},
+            {"Каменные Скалы",        QColor(80, 80, 80)},
+            {"Снежные Скалы",         QColor(195, 196, 197)}
+    };
+
+    QVBoxLayout* layout = ui->legendLayoutContainer;
+    if (!layout) return;
+
+    for (const auto& biome : biomes) {
+        QWidget* rowWidget = new QWidget();
+        QHBoxLayout* rowLayout = new QHBoxLayout(rowWidget);
+        rowLayout->setContentsMargins(0, 0, 0, 0);
+        rowLayout->setSpacing(10);
+
+        QLabel* colorBox = new QLabel();
+        colorBox->setFixedSize(24, 24);
+        QString style = QString("background-color: rgb(%1, %2, %3); border: 1px solid #555;")
+                                .arg(biome.color.red())
+                                .arg(biome.color.green())
+                                .arg(biome.color.blue());
+        colorBox->setStyleSheet(style);
+
+        QLabel* textLabel = new QLabel(biome.name);
+        textLabel->setStyleSheet("font-size: 12px;");
+        textLabel->setWordWrap(true);
+
+        rowLayout->addWidget(colorBox);
+        rowLayout->addWidget(textLabel);
+
+        layout->insertWidget(layout->count() - 1, rowWidget);
     }
 }

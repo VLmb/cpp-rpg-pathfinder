@@ -56,10 +56,10 @@ private:
 
         auto type = hero.getHeroType();
         
-        if (type == HeroType::ORC)    return {199, 21, 133};
-        if (type == HeroType::WOOD_ELF) return {255, 0, 0};
-        if (type == HeroType::HUMAN)    return {0, 0, 255};
+        if (type == HeroType::ORC)    return {255, 0, 0};
+        if (type == HeroType::WOOD_ELF) return {0, 0, 139};
         if (type == HeroType::GNOME)    return {0, 0, 0};
+        if (type == HeroType::HUMAN)    return {255, 69, 0};
         
         return {255, 50, 50}; // Красный дефолт
     }
@@ -95,7 +95,7 @@ private:
     void drawPathCell(std::vector<std::vector<Color>>& buffer, int gridX, int gridY, int factor, Color color) const {
         int startX = gridX * factor;
         int startY = gridY * factor;
-        float alpha = 0.5f; // Прозрачность пути
+        float alpha = 0.75f;
 
         for (int dy = 0; dy < factor; ++dy) {
             for (int dx = 0; dx < factor; ++dx) {

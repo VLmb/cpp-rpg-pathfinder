@@ -2,7 +2,7 @@
 
 int main() {
     const std::string filename = "map.ppm";
-    PathfinderManager manager(50, 32, filename);
+    PathfinderManager manager(30, 20, filename);
     manager.saveMapToFile();
 
     Point a = {1, 1};
@@ -35,12 +35,11 @@ int main() {
     Gnome gnome;
     //
     // manager.findPathAndDraw(a,e,human,"test.ppm");
-    auto t1 = manager.findPathAndDraw(a,e,gnome);
-    auto t2 = manager.findPathAndDraw(a,e,gnome, true);
-    std::cout << t1 << " " << t2 << std::endl;
+    // auto t1 = manager.findPathAndDraw(a,e,gnome);
+    // manager.findPathAndDraw(a,e,elf);
+    // manager.findPathAndDraw(a,e,human);
+    // manager.findPathAndDraw(a,e,orc);
 
-    PathfinderManager manager2(10, 10, filename);
-    manager2.printGridDigit();
 
 
     //

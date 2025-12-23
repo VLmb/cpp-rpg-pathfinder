@@ -28,7 +28,7 @@ int main() {
 
     int width = 10 * 12;
     int height = 8 * 12;
-    // SaveMapToImage(GenerateMap(width, height, perlin), "D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/map.ppm");
+    // SaveMapToImage(generateNaturalMap(width, height, perlin), "D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/map.ppm");
     
     return 0;
 }

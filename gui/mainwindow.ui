@@ -17,13 +17,20 @@
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
      <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <widget class="QPushButton" name="btnGenerate">
-        <property name="text">
-         <string>Сгенерировать карту</string>
-        </property>
-       </widget>
-      </item>
+     <item>
+            <widget class="QPushButton" name="btnGenerateNatural">
+             <property name="text">
+              <string>Сгенерировать карту (Natural)</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnGenerateCast">
+             <property name="text">
+              <string>Сгенерировать карту (Cast)</string>
+             </property>
+            </widget>
+           </item>
       <item>
        <widget class="QComboBox" name="comboHero">
         <item>
@@ -116,6 +123,84 @@
       <property name="mouseTracking">
        <bool>true</bool>
       </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="legendGroup">
+      <property name="title">
+       <string>Легенда биомов</string>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>220</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>250</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_Legend">
+       <property name="leftMargin">
+        <number>5</number>
+       </property>
+       <property name="rightMargin">
+        <number>5</number>
+       </property>
+       <item>
+        <widget class="QScrollArea" name="scrollAreaLegend">
+         <property name="widgetResizable">
+          <bool>true</bool>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <widget class="QWidget" name="scrollAreaWidgetContents">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>200</width>
+            <height>500</height>
+           </rect>
+          </property>
+          <layout class="QVBoxLayout" name="legendLayoutContainer">
+           <property name="spacing">
+            <number>5</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <!-- Сюда мы будем добавлять элементы программно -->
+           <item>
+            <spacer name="verticalSpacerLegend">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </item>
    </layout>

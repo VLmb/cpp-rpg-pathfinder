@@ -11,6 +11,9 @@
 
 class PathfinderManager {
 private:
+    static constexpr int MIN_DIMENSION = 1;
+    static constexpr int MAX_DIMENSION = 400;
+
     std::unique_ptr<Grid> grid;
     std::unique_ptr<CheckpointGraph> graph;
     std::unique_ptr<Perlin2D> perlin;
@@ -19,6 +22,8 @@ private:
     std::unique_ptr<MapRenderer> mapRenderer;
 
     std::string fileName;
+
+    bool isCastMap;
 
     int getMultiplier(Point checkpoint) {
         return map_generator::getMultFromCheckpointToPixels(graph->getWidth(), graph->getHeight());
@@ -36,7 +41,8 @@ public:
         std::unique_ptr<MapPathfinder> mapPathfinder,
         std::unique_ptr<GraphPathfinder> graphPathfinder,
         std::unique_ptr<MapRenderer> mapRenderer,
-        const std::string& filename
+        const std::string& filename,
+        bool isCastMap = false
         )
     : grid(std::move(grid)),
     graph(std::move(graph)),
@@ -49,16 +55,21 @@ public:
     }
 
     PathfinderManager(
-        int width, int height, const std::string& filename,
+        int width, int height, const std::string& filename, bool isCastMap = false,
         double scale = 0.0f, int seed = 12345) {
 
-        if (width < 5 && height < 5 && scale < 0.0f
-            && seed < 0) {
+        if (width < MIN_DIMENSION &&
+            height < MIN_DIMENSION &&
+            scale < 0.0f &&
+            seed < 0)
+        {
             throw std::invalid_argument("width, height must be greater than 5 and scale greater then 0.");
         }
 
         perlin = std::make_unique<Perlin2D>(seed);
-        auto map = map_generator::generateMap(width, height, perlin.get(), scale);
+        auto map = isCastMap
+                ? map_generator::generateCastMap(width, height, perlin.get(), scale)
+                : map_generator::generateNaturalMap(width, height, perlin.get(), scale);
         grid = std::make_unique<Grid>(map, map_generator::getGridScale(width, height));
         mapPathfinder = std::make_unique<MapPathfinder>(grid.get());
         graph = std::make_unique<CheckpointGraph>(width, height);
@@ -177,9 +188,4 @@ public:
             );
         }
     }
-
-    void printGridDigit() {
-        grid->printCells();
-    }
-
 };

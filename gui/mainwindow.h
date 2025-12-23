@@ -37,7 +37,8 @@ public:
     void resizeEvent(QResizeEvent *event) override;
 
 private slots:
-    void on_btnGenerate_clicked();
+    void on_btnGenerateNatural_clicked();
+    void on_btnGenerateCast_clicked();
     void on_btnAddEdge_clicked();
     void on_btnClearMap_clicked();
     void on_btnRemoveEdge_clicked();
@@ -71,6 +72,10 @@ private:
     void drawVisualEdges(); // Теперь берет данные из менеджера
     void showContextMenu(const QPoint &screenPos, int gridX, int gridY);
     void resetState();
+
+    void runGenerationDialog(bool isCast);
+
+    void setupLegend();
 
     void highlightCell(int gridX, int gridY);
 };

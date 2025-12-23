@@ -13,11 +13,13 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QScrollArea>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QVBoxLayout>
@@ -31,7 +33,8 @@ public:
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
     QVBoxLayout *verticalLayout;
-    QPushButton *btnGenerate;
+    QPushButton *btnGenerateNatural;
+    QPushButton *btnGenerateCast;
     QComboBox *comboHero;
     QPushButton *btnAddEdge;
     QPushButton *btnRemoveEdge;
@@ -41,6 +44,12 @@ public:
     QLabel *lblStatus;
     QSpacerItem *verticalSpacer;
     QGraphicsView *mapView;
+    QGroupBox *legendGroup;
+    QVBoxLayout *verticalLayout_Legend;
+    QScrollArea *scrollAreaLegend;
+    QWidget *scrollAreaWidgetContents;
+    QVBoxLayout *legendLayoutContainer;
+    QSpacerItem *verticalSpacerLegend;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -55,10 +64,15 @@ public:
         horizontalLayout->setObjectName("horizontalLayout");
         verticalLayout = new QVBoxLayout();
         verticalLayout->setObjectName("verticalLayout");
-        btnGenerate = new QPushButton(centralwidget);
-        btnGenerate->setObjectName("btnGenerate");
+        btnGenerateNatural = new QPushButton(centralwidget);
+        btnGenerateNatural->setObjectName("btnGenerateNatural");
 
-        verticalLayout->addWidget(btnGenerate);
+        verticalLayout->addWidget(btnGenerateNatural);
+
+        btnGenerateCast = new QPushButton(centralwidget);
+        btnGenerateCast->setObjectName("btnGenerateCast");
+
+        verticalLayout->addWidget(btnGenerateCast);
 
         comboHero = new QComboBox(centralwidget);
         comboHero->addItem(QString());
@@ -114,6 +128,35 @@ public:
 
         horizontalLayout->addWidget(mapView);
 
+        legendGroup = new QGroupBox(centralwidget);
+        legendGroup->setObjectName("legendGroup");
+        legendGroup->setMinimumSize(QSize(220, 0));
+        legendGroup->setMaximumSize(QSize(250, 16777215));
+        verticalLayout_Legend = new QVBoxLayout(legendGroup);
+        verticalLayout_Legend->setObjectName("verticalLayout_Legend");
+        verticalLayout_Legend->setContentsMargins(5, -1, 5, -1);
+        scrollAreaLegend = new QScrollArea(legendGroup);
+        scrollAreaLegend->setObjectName("scrollAreaLegend");
+        scrollAreaLegend->setWidgetResizable(true);
+        scrollAreaLegend->setFrameShape(QFrame::NoFrame);
+        scrollAreaWidgetContents = new QWidget();
+        scrollAreaWidgetContents->setObjectName("scrollAreaWidgetContents");
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 200, 500));
+        legendLayoutContainer = new QVBoxLayout(scrollAreaWidgetContents);
+        legendLayoutContainer->setSpacing(5);
+        legendLayoutContainer->setObjectName("legendLayoutContainer");
+        legendLayoutContainer->setContentsMargins(0, 0, 0, 0);
+        verticalSpacerLegend = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
+
+        legendLayoutContainer->addItem(verticalSpacerLegend);
+
+        scrollAreaLegend->setWidget(scrollAreaWidgetContents);
+
+        verticalLayout_Legend->addWidget(scrollAreaLegend);
+
+
+        horizontalLayout->addWidget(legendGroup);
+
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName("menubar");
@@ -131,7 +174,8 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "RPG Pathfinder", nullptr));
-        btnGenerate->setText(QCoreApplication::translate("MainWindow", "\320\241\320\263\320\265\320\275\320\265\321\200\320\270\321\200\320\276\320\262\320\260\321\202\321\214 \320\272\320\260\321\200\321\202\321\203", nullptr));
+        btnGenerateNatural->setText(QCoreApplication::translate("MainWindow", "\320\241\320\263\320\265\320\275\320\265\321\200\320\270\321\200\320\276\320\262\320\260\321\202\321\214 \320\272\320\260\321\200\321\202\321\203 (Natural)", nullptr));
+        btnGenerateCast->setText(QCoreApplication::translate("MainWindow", "\320\241\320\263\320\265\320\275\320\265\321\200\320\270\321\200\320\276\320\262\320\260\321\202\321\214 \320\272\320\260\321\200\321\202\321\203 (Cast)", nullptr));
         comboHero->setItemText(0, QCoreApplication::translate("MainWindow", "Human", nullptr));
         comboHero->setItemText(1, QCoreApplication::translate("MainWindow", "Wood Elf", nullptr));
         comboHero->setItemText(2, QCoreApplication::translate("MainWindow", "Orc", nullptr));
@@ -143,6 +187,7 @@ public:
         btnFindPathNatural->setText(QCoreApplication::translate("MainWindow", "\320\235\320\260\320\271\321\202\320\270 \320\277\321\203\321\202\321\214 (Natural)", nullptr));
         btnFindPathCast->setText(QCoreApplication::translate("MainWindow", "\320\235\320\260\320\271\321\202\320\270 \320\277\321\203\321\202\321\214 (Cast)", nullptr));
         lblStatus->setText(QCoreApplication::translate("MainWindow", "\320\241\321\202\320\260\321\202\321\203\321\201: \320\236\320\266\320\270\320\264\320\260\320\275\320\270\320\265", nullptr));
+        legendGroup->setTitle(QCoreApplication::translate("MainWindow", "\320\233\320\265\320\263\320\265\320\275\320\264\320\260 \320\261\320\270\320\276\320\274\320\276\320\262", nullptr));
     } // retranslateUi
 
 };

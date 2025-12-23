@@ -3,8 +3,9 @@
 #include <vector>
 #include <algorithm>
 #include <cmath>
-#include "Perlin2D.h"
+#include <iomanip>
 #include <iostream>
+#include "Perlin2D.h"
 
 namespace  map_generator {
 
@@ -121,9 +122,9 @@ namespace  map_generator {
     inline constexpr double SIZE_T1 = 10.0;
     inline constexpr double SIZE_T2 = 30.0;
 
-    inline constexpr double SCALE_T1 = 50.0;
-    inline constexpr double SCALE_T2 = 100.0;
-    inline constexpr double SCALE_T3 = 150.0;
+    inline constexpr double SCALE_T1 = 60.0;
+    inline constexpr double SCALE_T2 = 80.0;
+    inline constexpr double SCALE_T3 = 140.0;
 
     inline constexpr int FACTOR_T1 = 4;
     inline constexpr int FACTOR_T2 = 3;
@@ -163,7 +164,11 @@ namespace  map_generator {
         return getGridScale(width, height) * GRID_FACTOR;
     }
 
-    inline std::vector<std::vector<TerrainType>> generateMap(const int width, const int height, Perlin2D* perlin, double scale = 0.0f) {
+    inline const auto& normalize = [](double val, double mmin, double mmax) -> double {
+            return (val - mmin) / (mmax - mmin);
+        };
+
+    inline std::vector<std::vector<TerrainType>> generateNaturalMap(const int width, const int height, Perlin2D* perlin, double scale = 0.0f) {
         int modifiedWidth = width;
         int modifiedHeight = height;
 
@@ -180,11 +185,10 @@ namespace  map_generator {
         const int OFFSET_V = 5500;
         const int OFFSET_M = 12000;
 
-        // --- ПРОХОД 1 ---
         for (int y = 0; y < modifiedHeight; y++) {
             for (int x = 0; x < modifiedWidth; x++) {
-                double tVal = perlin->Noise((x + OFFSET_R) / scale, (y + OFFSET_R) / scale, 3, 0.5f);
-                double aVal = perlin->Noise((x + OFFSET_V) / scale, (y + OFFSET_V) / scale, 5, 0.4f);
+                double tVal = perlin->Noise((x + OFFSET_R) / scale, (y + OFFSET_R) / scale, 3, 0.4f);
+                double aVal = perlin->Noise((x + OFFSET_V) / scale, (y + OFFSET_V) / scale, 4, 0.5f);
                 double mVal = perlin->Noise((x + OFFSET_M) / scale, (y + OFFSET_M) / scale, 2, 0.5f);
 
                 if (tVal < minT) minT = tVal; if (tVal > maxT) maxT = tVal;
@@ -207,12 +211,11 @@ namespace  map_generator {
         std::cout << "min and max R " << minT<< ", " << maxT << ", " << std::endl;
         std::cout << "min and max M " << minM<< ", " << maxM << ", " << std::endl;
 
-        // --- ПРОХОД 2 ---
         for (int y = 0; y < modifiedHeight; y++) {
             for (int x = 0; x < modifiedWidth; x++) {
-                double nT = (map[y][x].temperature - minT) / (maxT - minT);
-                double nA = (map[y][x].altitude - minA) / (maxA - minA);
-                double nM = (map[y][x].moisture - minM) / (maxM - minM);
+                double nT = normalize(map[y][x].temperature, minT, maxT);
+                double nA = normalize(map[y][x].altitude, minA, maxA);
+                double nM = normalize(map[y][x].moisture, minM, maxM);
 
                 map[y][x].temperature = nT;
                 map[y][x].altitude = nA;
@@ -221,6 +224,69 @@ namespace  map_generator {
                 map[y][x].castAltitude = getCastAltitude(nA);
                 map[y][x].castTemperature = getCastTemperature(nT);
                 map[y][x].castMoisture = getCastTemperature(nM);
+            }
+        }
+        return map;
+    }
+
+    inline std::vector<std::vector<TerrainType>> generateCastMap(const int width, const int height, Perlin2D* perlin, double scale = 0.0f) {
+        int modifiedWidth = width;
+        int modifiedHeight = height;
+
+        calculateParams(modifiedWidth, modifiedHeight, scale);
+
+        std::vector<std::vector<TerrainType>> map(modifiedHeight, std::vector<TerrainType>(modifiedWidth, TerrainType()));
+
+        double mmin = 1000.0f, mmax = -1000.0f;
+
+        std::vector<std::vector<double>> castMap(modifiedHeight, std::vector<double>(modifiedWidth));
+        for (int y = 0; y < modifiedHeight; y++) {
+            for (int x = 0; x < modifiedWidth; x++) {
+                double val = perlin->Noise(x / (scale * 0.7), y / (scale * 0.75), 4, 0.5f);
+
+                mmin = std::min(mmin, val);
+                mmax = std::max(mmax, val);
+
+                castMap[y][x] = val;
+            }
+        }
+
+        if (mmin == mmax) {
+            mmax += 0.001f;
+        }
+
+        for (int y = 0; y < modifiedHeight; y++) {
+            for (int x = 0; x < modifiedWidth; x++) {
+                castMap[y][x] = normalize(castMap[y][x], mmin, mmax);
+
+                if (castMap[y][x] > 0.65) {
+                    map[y][x].temperature = 1.0;
+                    map[y][x].altitude = 0.1;
+                    map[y][x].moisture = 0.1;
+                    map[y][x].biome = getBiomeType(
+                        map[y][x].temperature,
+                        map[y][x].altitude,
+                        map[y][x].moisture
+                        );
+                } else if (castMap[y][x] > 0.4) {
+                    map[y][x].temperature = 0.1;
+                    map[y][x].altitude = 1.0;
+                    map[y][x].moisture = 0.1;
+                    map[y][x].biome = getBiomeType(
+                        map[y][x].temperature,
+                        map[y][x].altitude,
+                        map[y][x].moisture
+                        );
+                } else {
+                    map[y][x].temperature = 0.1;
+                    map[y][x].altitude = 0.1;
+                    map[y][x].moisture = 1.0;
+                    map[y][x].biome = getBiomeType(
+                        map[y][x].temperature,
+                        map[y][x].altitude,
+                        map[y][x].moisture
+                        );
+                }
             }
         }
         return map;

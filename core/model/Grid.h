@@ -17,7 +17,7 @@ struct CellProperty {
 
 class Grid : public AbstractGraph {
 private:
-    static constexpr int MIN_DIMENSION = 5;
+    static constexpr int MIN_DIMENSION = 1;
     static constexpr int MAX_DIMENSION = 400;
 
     int grid_scale;
