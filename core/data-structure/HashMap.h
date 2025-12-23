@@ -108,4 +108,64 @@ public:
 
     size_t size() const { return elementCount; }
     bool empty() const { return elementCount == 0; }
+
+    std::vector<std::pair<Key, T>> entries() const {
+        std::vector<std::pair<Key, T>> result;
+        result.reserve(elementCount);
+
+        for (const auto& bucket : buckets) {
+            for (const auto& e : bucket) {
+                result.emplace_back(e.key, e.value);
+            }
+        }
+        return result;
+    }
+
+    std::vector<Key> keys() const {
+        std::vector<Key> result;
+        result.reserve(elementCount);
+
+        for (const auto& bucket : buckets) {
+            for (const auto& e : bucket) {
+                result.push_back(e.key);
+            }
+        }
+        return result;
+    }
+
+    std::vector<T> values() const {
+        std::vector<T> result;
+        result.reserve(elementCount);
+
+        for (const auto& bucket : buckets) {
+            for (const auto& e : bucket) {
+                result.push_back(e.value);
+            }
+        }
+        return result;
+    }
+
+    std::vector<const Key*> keysPtr() const {
+        std::vector<const Key*> result;
+        result.reserve(elementCount);
+
+        for (const auto& bucket : buckets) {
+            for (const auto& e : bucket) {
+                result.push_back(&e.key);
+            }
+        }
+        return result;
+    }
+
+    std::vector<const T*> valuesPtr() const {
+        std::vector<const T*> result;
+        result.reserve(elementCount);
+
+        for (const auto& bucket : buckets) {
+            for (const auto& e : bucket) {
+                result.push_back(&e.value);
+            }
+        }
+        return result;
+    }
 };

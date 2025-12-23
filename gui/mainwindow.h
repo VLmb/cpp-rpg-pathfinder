@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
-#include <QGraphicsRectItem> // <--- Добавили
+#include <QGraphicsRectItem>
 #include <QMouseEvent>
 #include <vector>
 #include <memory>
@@ -19,10 +19,10 @@ enum class AppState {
     IDLE,
     SELECTING_EDGE_1,
     SELECTING_EDGE_2,
+    SELECTING_REMOVE_EDGE_1, // Выбор первой вершины для удаления
+    SELECTING_REMOVE_EDGE_2, // Выбор второй вершины для удаления
     SELECTING_PATH_1,
-    SELECTING_PATH_2,
-    SELECTING_REMOVE_EDGE_1,
-    SELECTING_REMOVE_EDGE_2
+    SELECTING_PATH_2
 };
 
 class MainWindow : public QMainWindow
@@ -34,23 +34,20 @@ public:
     ~MainWindow();
 
     bool eventFilter(QObject *watched, QEvent *event) override;
-
-    // Переопределяем событие изменения размера окна, чтобы карта подстраивалась
     void resizeEvent(QResizeEvent *event) override;
 
 private slots:
     void on_btnGenerate_clicked();
     void on_btnAddEdge_clicked();
-    void on_btnFindPath_clicked();
+    void on_btnClearMap_clicked();
     void on_btnRemoveEdge_clicked();
+    void on_btnFindPath_clicked();
     void on_comboHero_currentIndexChanged(int index);
 
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;
     QGraphicsPixmapItem *mapPixmapItem;
-
-    // Квадратик, который показывает, какую клетку мы выбрали
     QGraphicsRectItem *selectionRect;
 
     PathfinderManager *manager;
@@ -63,20 +60,15 @@ private:
     const std::string mapFileName = "map.ppm";
 
     AppState currentState;
-    QPoint tempPoint1;
+    QPoint tempPoint1; // Хранит координаты первого клика
 
-    struct VisualEdge {
-        int u_x, u_y, v_x, v_y;
-    };
-    std::vector<VisualEdge> visualEdges;
-
+           // Вспомогательные методы
     void reloadMapImage();
     void drawOverlayGrid(int imgW, int imgH);
-    void drawVisualEdges();
+    void drawVisualEdges(); // Теперь берет данные из менеджера
     void showContextMenu(const QPoint &screenPos, int gridX, int gridY);
     void resetState();
 
-    // Вспомогательная функция для подсветки клетки
     void highlightCell(int gridX, int gridY);
 };
 

@@ -6,6 +6,7 @@
 #include "path-find/GraphPathfinder.h"
 #include "path-find/MapPathfinder.h"
 #include "view/MapRenderer.h"
+#include "model/Hero.h"
 
 
 class PathfinderManager {
@@ -111,16 +112,6 @@ public:
 
     bool removeEdgeFromCheckpointGraph(Point checkpoint1, Point checkpoint2) {
         bool f = graph->removeEdge(checkpoint1, checkpoint2);
-        f = graph->removeVertex(checkpoint1);
-        mapRenderer->undrawGraphVertices(
-            getMappedPixelsCoordinate(checkpoint1),
-            getMultiplier(checkpoint1)
-            );
-        f = graph->removeVertex(checkpoint1);
-        mapRenderer->undrawGraphVertices(
-            getMappedPixelsCoordinate(checkpoint2),
-            getMultiplier(checkpoint2)
-            );
         mapRenderer->saveModifiedMap(fileName);
         return f;
     }
@@ -162,4 +153,28 @@ public:
         mapRenderer->saveModifiedMap(fileName);
     }
 
+    std::vector<std::vector<int>> getCheckpointGraphAdjList() const {
+        return graph->getAdjList();
+    }
+
+    Point getPointOfIndex(int idx) const {
+        return graph->pointOfIndex(idx);
+    }
+
+    int getIndexOfPoint(int x, int y) const {
+        return graph->indexOf(x, y);
+    }
+
+    void cleanMap() {
+        mapRenderer->cleanMap(fileName);
+    }
+
+    void drawAllCheckpoints() {
+        for (auto checkpoint: graph->getVerticesList()) {
+            mapRenderer->drawGraphVertices(
+            getMappedPixelsCoordinate(checkpoint),
+            getMultiplier(checkpoint)
+            );
+        }
+    }
 };

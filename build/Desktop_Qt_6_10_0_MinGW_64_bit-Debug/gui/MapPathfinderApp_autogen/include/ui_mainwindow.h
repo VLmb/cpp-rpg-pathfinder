@@ -35,6 +35,7 @@ public:
     QComboBox *comboHero;
     QPushButton *btnAddEdge;
     QPushButton *btnRemoveEdge;
+    QPushButton *btnClearMap;
     QPushButton *btnFindPath;
     QLabel *lblStatus;
     QSpacerItem *verticalSpacer;
@@ -76,6 +77,11 @@ public:
         btnRemoveEdge->setObjectName("btnRemoveEdge");
 
         verticalLayout->addWidget(btnRemoveEdge);
+
+        btnClearMap = new QPushButton(centralwidget);
+        btnClearMap->setObjectName("btnClearMap");
+
+        verticalLayout->addWidget(btnClearMap);
 
         btnFindPath = new QPushButton(centralwidget);
         btnFindPath->setObjectName("btnFindPath");
@@ -127,6 +133,7 @@ public:
 
         btnAddEdge->setText(QCoreApplication::translate("MainWindow", "\320\224\320\276\320\261\320\260\320\262\320\270\321\202\321\214 \321\201\320\262\321\217\320\267\321\214", nullptr));
         btnRemoveEdge->setText(QCoreApplication::translate("MainWindow", "\320\243\320\264\320\260\320\273\320\270\321\202\321\214 \321\201\320\262\321\217\320\267\321\214", nullptr));
+        btnClearMap->setText(QCoreApplication::translate("MainWindow", "\320\236\321\207\320\270\321\201\321\202\320\270\321\202\321\214 \320\272\320\260\321\200\321\202\321\203", nullptr));
         btnFindPath->setText(QCoreApplication::translate("MainWindow", "\320\235\320\260\320\271\321\202\320\270 \320\277\321\203\321\202\321\214", nullptr));
         lblStatus->setText(QCoreApplication::translate("MainWindow", "\320\241\321\202\320\260\321\202\321\203\321\201: \320\236\320\266\320\270\320\264\320\260\320\275\320\270\320\265", nullptr));
     } // retranslateUi

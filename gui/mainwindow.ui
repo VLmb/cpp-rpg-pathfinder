@@ -63,6 +63,13 @@
              </widget>
             </item>
       <item>
+       <widget class="QPushButton" name="btnClearMap">
+        <property name="text">
+         <string>Очистить карту</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="btnFindPath">
         <property name="text">
          <string>Найти путь</string>

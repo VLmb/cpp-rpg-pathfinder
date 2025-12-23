@@ -141,4 +141,14 @@ public:
     }
 
     std::vector<std::vector<int>> getAdjList() const { return adjList; }
+
+    std::vector<Point> getVerticesList() const {
+        std::vector<Point> result;
+        for (int i = 0; i < width * height; i++) {
+            if (isVertex[i]) {
+                result.push_back(pointOfIndex(i));
+            }
+        }
+        return result;
+    }
 };

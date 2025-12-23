@@ -85,4 +85,37 @@ public:
 
         return gridPath;
     }
+
+    std::vector<Point> getCachedGridPath(Point start, Point goal, Hero& hero) {
+        if (auto* cached = pathCache.getPtr(
+            PathKey{
+            getGridCoordinate(start),
+            getGridCoordinate(goal),
+            &hero })) {
+            return cached->path;
+        }
+        return {};
+    }
+
+    bool isGridPathCached(Point start, Point goal, Hero& hero) {
+        return (pathCache.getPtr(
+            PathKey{
+            getGridCoordinate(start),
+            getGridCoordinate(goal),
+            &hero })
+            != nullptr);
+    }
+
+    bool removeGridPathFromCache(Point start, Point goal, Hero& hero) {
+        return pathCache.remove(
+            PathKey{
+                getGridCoordinate(start),
+                getGridCoordinate(goal),
+                &hero
+            });
+    }
+
+    std::vector<const PathWithTime*> getAllCachedGridPathWithTime() {
+        return pathCache.valuesPtr();
+    }
 };

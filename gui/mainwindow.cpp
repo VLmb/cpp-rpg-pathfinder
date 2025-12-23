@@ -11,37 +11,54 @@
 #include <QMenu>
 #include <QDebug>
 #include <QFile>
+#include <cmath>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-      , ui(new Ui::MainWindow)
-      , scene(new QGraphicsScene(this))
-      , mapPixmapItem(nullptr)
-      , selectionRect(nullptr)
-      , manager(nullptr)
-      , currentHero(nullptr)
-      , userGridWidth(0)
-      , userGridHeight(0)
-      , cellStepX(1.0)
-      , cellStepY(1.0)
-      , currentState(AppState::IDLE)
+    , ui(new Ui::MainWindow)
+    , scene(new QGraphicsScene(this))
+    , mapPixmapItem(nullptr)
+    , selectionRect(nullptr)
+    , manager(nullptr)
+    , currentHero(nullptr)
+    , userGridWidth(0)
+    , userGridHeight(0)
+    , cellStepX(1.0)
+    , cellStepY(1.0)
+    , currentState(AppState::IDLE)
 {
     ui->setupUi(this);
 
-           // Настройка сцены
+    // Настройка сцены
     ui->mapView->setScene(scene);
     ui->mapView->viewport()->installEventFilter(this);
 
-    // Настройки для зума и скролла
+    // Настройки зума и скролла
     ui->mapView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
     ui->mapView->setResizeAnchor(QGraphicsView::AnchorUnderMouse);
     ui->mapView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->mapView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-           // === ИЗМЕНЕНИЕ: Настройка списка героев ===
-           // Добавляем пустой пункт в начало, чтобы заставить пользователя выбрать
-    ui->comboHero->insertItem(0, "");
-    ui->comboHero->setCurrentIndex(0); // Выбираем пустой пункт по умолчанию
+    // === ЗАПОЛНЕНИЕ СПИСКА ГЕРОЕВ ИЗ КОДА ===
+    ui->comboHero->clear(); // Удаляем то, что было в .ui файле
+    ui->comboHero->addItem(""); // Индекс 0 - Пустой выбор
+
+    // Создаем временные объекты, чтобы узнать их имена
+    // Порядок важен, он должен совпадать с switch-case внизу!
+    Human tempHuman;
+    ui->comboHero->addItem(QString::fromStdString(tempHuman.getHeroName())); // Индекс 1
+
+    WoodElf tempElf;
+    ui->comboHero->addItem(QString::fromStdString(tempElf.getHeroName()));   // Индекс 2
+
+    Orc tempOrc;
+    ui->comboHero->addItem(QString::fromStdString(tempOrc.getHeroName()));   // Индекс 3
+
+    Gnome tempGnome;
+    ui->comboHero->addItem(QString::fromStdString(tempGnome.getHeroName())); // Индекс 4
+
+    // Выбираем пустой элемент по умолчанию
+    ui->comboHero->setCurrentIndex(0);
 
     ui->lblStatus->setText("Готово к работе. Сгенерируйте карту.");
 }
@@ -62,7 +79,6 @@ void MainWindow::reloadMapImage()
     selectionRect = nullptr;
 
     QImage image;
-    // Если файла еще нет (до генерации), просто выходим
     if (!image.load(QString::fromStdString(mapFileName))) {
         return;
     }
@@ -82,8 +98,6 @@ void MainWindow::reloadMapImage()
     drawVisualEdges();
 
     scene->setSceneRect(0, 0, imgW, imgH);
-
-    // Растягиваем на всё окно
     ui->mapView->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
 }
 
@@ -107,17 +121,28 @@ void MainWindow::drawOverlayGrid(int imgW, int imgH)
 
 void MainWindow::drawVisualEdges()
 {
+    if (!manager) return;
+
     QPen edgePen(Qt::red);
     edgePen.setWidth(1);
 
-    for (const auto &edge : visualEdges) {
-        double x1 = (edge.u_x * cellStepX) + (cellStepX / 2.0);
-        double y1 = (edge.u_y * cellStepY) + (cellStepY / 2.0);
-        double x2 = (edge.v_x * cellStepX) + (cellStepX / 2.0);
-        double y2 = (edge.v_y * cellStepY) + (cellStepY / 2.0);
+    auto adjList = manager->getCheckpointGraphAdjList();
 
-        QGraphicsLineItem *line = scene->addLine(x1, y1, x2, y2, edgePen);
-        line->setZValue(2);
+    for (int u = 0; u < (int)adjList.size(); ++u) {
+        for (int v : adjList[u]) {
+            if (u < v) {
+                auto p1 = manager->getPointOfIndex(u);
+                auto p2 = manager->getPointOfIndex(v);
+
+                double x1 = (p1.x * cellStepX) + (cellStepX / 2.0);
+                double y1 = (p1.y * cellStepY) + (cellStepY / 2.0);
+                double x2 = (p2.x * cellStepX) + (cellStepX / 2.0);
+                double y2 = (p2.y * cellStepY) + (cellStepY / 2.0);
+
+                QGraphicsLineItem *line = scene->addLine(x1, y1, x2, y2, edgePen);
+                line->setZValue(2);
+            }
+        }
     }
 }
 
@@ -131,20 +156,13 @@ void MainWindow::highlightCell(int gridX, int gridY)
     selectionRect->setVisible(true);
 }
 
-void MainWindow::on_btnRemoveEdge_clicked()
-{
-    if (!manager) return;
-    currentState = AppState::SELECTING_REMOVE_EDGE_1;
-    ui->lblStatus->setText("Удаление связи: выберите первую вершину");
-}
-
 // === События ===
 
 bool MainWindow::eventFilter(QObject *watched, QEvent *event)
 {
     if (watched == ui->mapView->viewport()) {
 
-        // Зум колесиком
+        // Зум
         if (event->type() == QEvent::Wheel) {
             QWheelEvent *we = static_cast<QWheelEvent*>(event);
             const double scaleFactor = 1.15;
@@ -156,7 +174,7 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
             return true;
         }
 
-               // Клики
+        // Клики
         if (event->type() == QEvent::MouseButtonPress) {
             if (!manager) return false;
 
@@ -173,86 +191,87 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
             highlightCell(gridX, gridY);
 
             switch (currentState) {
-                case AppState::IDLE:
-                    ui->lblStatus->setText(QString("Выбрана клетка: %1, %2").arg(gridX).arg(gridY));
-                    if (me->button() == Qt::RightButton) {
-                        showContextMenu(me->globalPos(), gridX, gridY);
-                    }
-                    break;
+            case AppState::IDLE:
+                ui->lblStatus->setText(QString("Выбрана клетка: %1, %2").arg(gridX).arg(gridY));
+                if (me->button() == Qt::RightButton) {
+                    showContextMenu(me->globalPos(), gridX, gridY);
+                }
+                break;
 
-                case AppState::SELECTING_EDGE_1:
-                    tempPoint1 = QPoint(gridX, gridY);
-                    currentState = AppState::SELECTING_EDGE_2;
-                    ui->lblStatus->setText(QString("Связь: старт [%1, %2]. Жду финиш...").arg(gridX).arg(gridY));
-                    break;
+            case AppState::SELECTING_EDGE_1:
+                tempPoint1 = QPoint(gridX, gridY);
+                currentState = AppState::SELECTING_EDGE_2;
+                ui->lblStatus->setText(QString("Связь: старт [%1, %2]. Жду финиш...").arg(gridX).arg(gridY));
+                break;
 
-                case AppState::SELECTING_EDGE_2:
-                    if (manager->addEdgeToCheckpointGraph(tempPoint1.x(), tempPoint1.y(), gridX, gridY)) {
-                        visualEdges.push_back({tempPoint1.x(), tempPoint1.y(), gridX, gridY});
-                        ui->lblStatus->setText("Связь добавлена.");
-                        reloadMapImage();
-                    } else {
-                        ui->lblStatus->setText("Ошибка: Нельзя создать связь (проверьте вершины).");
-                    }
-                    resetState();
-                    break;
-                case AppState::SELECTING_REMOVE_EDGE_1:
+            case AppState::SELECTING_EDGE_2:
+                if (manager->addEdgeToCheckpointGraph(tempPoint1.x(), tempPoint1.y(), gridX, gridY)) {
+                    ui->lblStatus->setText("Связь добавлена.");
+                    reloadMapImage();
+                } else {
+                    ui->lblStatus->setText("Ошибка добавления связи.");
+                }
+                resetState();
+                break;
+
+            case AppState::SELECTING_REMOVE_EDGE_1:
                 tempPoint1 = QPoint(gridX, gridY);
                 currentState = AppState::SELECTING_REMOVE_EDGE_2;
-                ui->lblStatus->setText(QString("Удаление: [%1, %2]. Выберите вторую вершину.").arg(gridX).arg(gridY));
+                ui->lblStatus->setText(QString("Удаление: старт [%1, %2]. Жду финиш...").arg(gridX).arg(gridY));
                 break;
 
             case AppState::SELECTING_REMOVE_EDGE_2:
-                // 1. Пытаемся удалить в логике (Manager)
                 if (manager->removeEdgeFromCheckpointGraph(tempPoint1.x(), tempPoint1.y(), gridX, gridY)) {
-
-                    // 2. Если успех — удаляем визуальную линию из списка
-                    // Нам нужно найти ребро (u,v) или (v,u), так как граф неориентированный
-                    auto it = std::remove_if(visualEdges.begin(), visualEdges.end(),
-                        [&](const VisualEdge& edge) {
-                            bool matchDirect = (edge.u_x == tempPoint1.x() && edge.u_y == tempPoint1.y() &&
-                                                edge.v_x == gridX && edge.v_y == gridY);
-                            bool matchReverse = (edge.u_x == gridX && edge.u_y == gridY &&
-                                                 edge.v_x == tempPoint1.x() && edge.v_y == tempPoint1.y());
-                            return matchDirect || matchReverse;
-                        });
-
-                    // Фактически удаляем элементы из вектора
-                    if (it != visualEdges.end()) {
-                        visualEdges.erase(it, visualEdges.end());
-                    }
-
                     ui->lblStatus->setText("Связь удалена.");
-                    reloadMapImage(); // Перерисовка (линия исчезнет)
+                    reloadMapImage();
                 } else {
-                    // 3. Если ошибка (связи не было или вершины не существуют)
                     QMessageBox::warning(this, "Ошибка", "Не удалось удалить связь.\nВозможно, её не существует.");
                     ui->lblStatus->setText("Ошибка удаления связи.");
                 }
                 resetState();
                 break;
 
-                case AppState::SELECTING_PATH_1:
-                    tempPoint1 = QPoint(gridX, gridY);
-                    currentState = AppState::SELECTING_PATH_2;
-                    ui->lblStatus->setText(QString("Путь: старт [%1, %2]. Жду финиш...").arg(gridX).arg(gridY));
-                    break;
+            case AppState::SELECTING_PATH_1:
+                tempPoint1 = QPoint(gridX, gridY);
+                currentState = AppState::SELECTING_PATH_2;
+                ui->lblStatus->setText(QString("Путь: старт [%1, %2]. Жду финиш...").arg(gridX).arg(gridY));
+                break;
 
-                case AppState::SELECTING_PATH_2:
-                    try {
-                        if (!currentHero) throw std::runtime_error("Герой не выбран!");
+            case AppState::SELECTING_PATH_2:
+                try {
+                    if (!currentHero) throw std::runtime_error("Герой не выбран!");
 
-                        // === ИЗМЕНЕНИЕ: Убрали mapFileName из вызова ===
-                        double time = manager->findPathAndDraw(tempPoint1.x(), tempPoint1.y(), gridX, gridY, *currentHero);
+                    double time = manager->findPathAndDraw(tempPoint1.x(), tempPoint1.y(), gridX, gridY, *currentHero);
 
-                        ui->lblStatus->setText(QString("Время пути: %1").arg(time));
-                        reloadMapImage();
-                    } catch (const std::exception &e) {
-                        ui->lblStatus->setText(QString("Ошибка: %1").arg(e.what()));
-                        QMessageBox::warning(this, "Ошибка", e.what());
+                    if (std::isinf(time)) {
+                        QMessageBox::warning(this, "Нет пути", "Не существует пути между этими вершинами!");
+                        ui->lblStatus->setText("Путь не найден (бесконечность).");
+                    } else {
+                        // Получаем имя героя через метод
+                        QString heroName = QString::fromStdString(currentHero->getHeroName());
+                        QString timeStr = QString::number(time, 'f', 2);
+
+                        QString msg = QString("Маршрут построен!\n\n"
+                                              "Начало: [%1, %2]\n"
+                                              "Конец: [%3, %4]\n"
+                                              "Герой: %5\n"
+                                              "Время в пути: %6")
+                                              .arg(tempPoint1.x()).arg(tempPoint1.y())
+                                              .arg(gridX).arg(gridY)
+                                              .arg(heroName)
+                                              .arg(timeStr);
+
+                        QMessageBox::information(this, "Результат поиска", msg);
+                        ui->lblStatus->setText(QString("Путь найден: %1").arg(timeStr));
                     }
-                    resetState();
-                    break;
+
+                    reloadMapImage();
+                } catch (const std::exception &e) {
+                    ui->lblStatus->setText(QString("Ошибка: %1").arg(e.what()));
+                    QMessageBox::critical(this, "Ошибка", e.what());
+                }
+                resetState();
+                break;
             }
             return true;
         }
@@ -264,7 +283,7 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 {
     QMainWindow::resizeEvent(event);
     if (scene && scene->width() > 0) {
-        ui->mapView->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
+         ui->mapView->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
     }
 }
 
@@ -296,16 +315,16 @@ void MainWindow::showContextMenu(const QPoint &screenPos, int gridX, int gridY)
 void MainWindow::on_btnGenerate_clicked()
 {
     QDialog dialog(this);
-    dialog.setWindowTitle("Параметры карты");
+    dialog.setWindowTitle("Параметры");
     QFormLayout form(&dialog);
 
-    QSpinBox *spinW = new QSpinBox(&dialog); spinW->setRange(2, 2000); spinW->setValue(20);
+    QSpinBox *spinW = new QSpinBox(&dialog); spinW->setRange(2, 2000); spinW->setValue(30);
     QSpinBox *spinH = new QSpinBox(&dialog); spinH->setRange(2, 2000); spinH->setValue(20);
 
     QDoubleSpinBox *spinScale = new QDoubleSpinBox(&dialog);
     spinScale->setRange(0.0, 500.0);
     spinScale->setSingleStep(0.1);
-    spinScale->setValue(0.0f); // Default 0.0
+    spinScale->setValue(0.0f);
 
     QSpinBox *spinSeed = new QSpinBox(&dialog); spinSeed->setRange(0, 9999999); spinSeed->setValue(12345);
 
@@ -326,13 +345,9 @@ void MainWindow::on_btnGenerate_clicked()
         userGridHeight = spinH->value();
         float scaleVal = static_cast<float>(spinScale->value());
 
-               // === ИЗМЕНЕНИЕ: mapFileName передаем в конструктор ===
         manager = new PathfinderManager(userGridWidth, userGridHeight, mapFileName, scaleVal, spinSeed->value());
-
-        // === ИЗМЕНЕНИЕ: Убрали mapFileName из вызова, если метод больше не принимает аргументов ===
         manager->saveMapToFile();
 
-        visualEdges.clear();
         reloadMapImage();
 
         ui->lblStatus->setText("Карта сгенерирована.");
@@ -343,19 +358,44 @@ void MainWindow::on_btnAddEdge_clicked()
 {
     if (!manager) return;
     currentState = AppState::SELECTING_EDGE_1;
-    ui->lblStatus->setText("Связь: выберите первую клетку (Left Click)");
+    ui->lblStatus->setText("Добавление связи: выберите первую вершину");
+}
+
+void MainWindow::on_btnClearMap_clicked()
+{
+    if (!manager) {
+        QMessageBox::information(this, "Инфо", "Карта еще не сгенерирована.");
+        return;
+    }
+
+    // Вызываем метод очистки в менеджере
+    manager->cleanMap();
+
+    manager->drawAllCheckpoints();
+    manager->saveMapToFile();
+
+    // Перерисовываем картинку
+    reloadMapImage();
+
+    ui->lblStatus->setText("Карта очищена (пути и вершины сброшены).");
+}
+
+void MainWindow::on_btnRemoveEdge_clicked()
+{
+    if (!manager) return;
+    currentState = AppState::SELECTING_REMOVE_EDGE_1;
+    ui->lblStatus->setText("Удаление связи: выберите первую вершину");
 }
 
 void MainWindow::on_btnFindPath_clicked()
 {
     if (!manager) return;
-    // Проверка на nullptr (герой должен быть выбран)
     if (!currentHero) {
         QMessageBox::warning(this, "Герой", "Сначала выберите героя из списка!");
         return;
     }
     currentState = AppState::SELECTING_PATH_1;
-    ui->lblStatus->setText("Поиск пути: выберите старт (Left Click)");
+    ui->lblStatus->setText("Поиск пути: выберите старт");
 }
 
 void MainWindow::resetState()
@@ -370,17 +410,9 @@ void MainWindow::on_comboHero_currentIndexChanged(int index)
         currentHero = nullptr;
     }
 
-    // === ИЗМЕНЕНИЕ: Сдвиг индексов из-за пустой первой строки ===
-    // 0 = "" (пусто)
-    // 1 = Human
-    // 2 = Wood Elf
-    // 3 = Orc
-    // 4 = Gnome
-
+    // Индекс 0 = "", Индексы 1..4 = Герои
     switch (index) {
-        case 0:
-            currentHero = nullptr;
-            break;
+        case 0: currentHero = nullptr; break;
         case 1: currentHero = new Human(); break;
         case 2: currentHero = new WoodElf(); break;
         case 3: currentHero = new Orc(); break;
@@ -389,7 +421,9 @@ void MainWindow::on_comboHero_currentIndexChanged(int index)
     }
 
     if (currentHero) {
-        ui->lblStatus->setText("Герой выбран: " + ui->comboHero->currentText());
+        // Берем имя уже из созданного объекта
+        QString heroName = QString::fromStdString(currentHero->getHeroName());
+        ui->lblStatus->setText("Герой выбран: " + heroName);
     } else {
         ui->lblStatus->setText("Герой не выбран");
     }

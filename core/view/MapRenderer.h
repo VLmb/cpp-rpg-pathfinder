@@ -309,4 +309,9 @@ public:
             }
         }
     }
+
+    void cleanMap(std::string& filename) {
+        map_modifiedPixels = map_basePixels;
+        saveModifiedMap(filename);
+    }
 };
