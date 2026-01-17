@@ -17,22 +17,21 @@ private:
         double time;
     };
 
-    double getStepTime(Point cur, Point next, Hero &hero, bool castTerrain = false) const override {
+    double getStepTime(Point cur, Point next, Hero &hero) const override {
         return (mapPathfinder->findPath(
             mapPathfinder->getGridCoordinate(cur),
             mapPathfinder->getGridCoordinate(next),
-            hero,
-            castTerrain
+            hero
             )).time;
     }
 
 public:
     GraphPathfinder(CheckpointGraph* graph, MapPathfinder* mapPathfinder) : graph(graph), mapPathfinder(mapPathfinder) {}
 
-    PathWithTime findPath(const Point &start, const Point &goal, Hero &hero, bool castTerrain = false) {
+    PathWithTime findPath(const Point &start, const Point &goal, Hero &hero) {
         if (!graph->pointIsVertex(start) || !graph->pointIsVertex(goal)) {
             throw std::invalid_argument("Start and goal are invalid");
         }
-        return AStar::findPath(start, goal, hero, graph, castTerrain);
+        return AStar::findPath(start, goal, hero, graph);
     }
 };

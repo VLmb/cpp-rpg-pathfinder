@@ -454,6 +454,7 @@ D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/build/Desktop_
   D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/core/data-structure/DynamicArray.h \
   D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/core/data-structure/HashMap.h \
   D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/core/data-structure/PriorityQueue.h \
+  D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/core/map-generation/MapConfig.h \
   D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/core/map-generation/MapGenerator.h \
   D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/core/map-generation/Perlin2D.h \
   D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/core/model/AbstractGraph.h \

@@ -13,6 +13,6 @@ public:
     };
 
     virtual ~PathfinderInterface() = default;
-    virtual PathWithTime findPath(const T& start, const T& goal, Hero& hero, AbstractGraph* graph, bool castTerrain = false) = 0;
+    virtual PathWithTime findPath(const T& start, const T& goal, Hero& hero, AbstractGraph* graph) = 0;
 
 };

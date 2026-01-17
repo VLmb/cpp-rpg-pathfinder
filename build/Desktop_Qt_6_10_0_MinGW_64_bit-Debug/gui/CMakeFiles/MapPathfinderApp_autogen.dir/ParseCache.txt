@@ -468,6 +468,6 @@ D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/gui/mainwindow
  mdp:D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/core/path-find/PathfinderInterface.h
  mdp:D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/core/view/MapRenderer.h
  mdp:D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/gui/mainwindow.h
-D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/gui/main.cpp
 D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/gui/mainwindow.cpp
  uic:ui_mainwindow.h
+D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/gui/main.cpp

@@ -40,7 +40,6 @@ public:
     QPushButton *btnRemoveEdge;
     QPushButton *btnClearMap;
     QPushButton *btnFindPathNatural;
-    QPushButton *btnFindPathCast;
     QLabel *lblStatus;
     QSpacerItem *verticalSpacer;
     QGraphicsView *mapView;
@@ -103,14 +102,9 @@ public:
 
         verticalLayout->addWidget(btnFindPathNatural);
 
-        btnFindPathCast = new QPushButton(centralwidget);
-        btnFindPathCast->setObjectName("btnFindPathCast");
-
-        verticalLayout->addWidget(btnFindPathCast);
-
         lblStatus = new QLabel(centralwidget);
         lblStatus->setObjectName("lblStatus");
-        lblStatus->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop);
+        lblStatus->setAlignment(Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop);
         lblStatus->setWordWrap(true);
 
         verticalLayout->addWidget(lblStatus);
@@ -137,11 +131,11 @@ public:
         verticalLayout_Legend->setContentsMargins(5, -1, 5, -1);
         scrollAreaLegend = new QScrollArea(legendGroup);
         scrollAreaLegend->setObjectName("scrollAreaLegend");
+        scrollAreaLegend->setFrameShape(QFrame::Shape::NoFrame);
         scrollAreaLegend->setWidgetResizable(true);
-        scrollAreaLegend->setFrameShape(QFrame::NoFrame);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName("scrollAreaWidgetContents");
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 200, 500));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 234, 596));
         legendLayoutContainer = new QVBoxLayout(scrollAreaWidgetContents);
         legendLayoutContainer->setSpacing(5);
         legendLayoutContainer->setObjectName("legendLayoutContainer");
@@ -160,7 +154,7 @@ public:
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName("menubar");
-        menubar->setGeometry(QRect(0, 0, 1000, 22));
+        menubar->setGeometry(QRect(0, 0, 1000, 21));
         MainWindow->setMenuBar(menubar);
         statusbar = new QStatusBar(MainWindow);
         statusbar->setObjectName("statusbar");
@@ -174,8 +168,8 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "RPG Pathfinder", nullptr));
-        btnGenerateNatural->setText(QCoreApplication::translate("MainWindow", "\320\241\320\263\320\265\320\275\320\265\321\200\320\270\321\200\320\276\320\262\320\260\321\202\321\214 \320\272\320\260\321\200\321\202\321\203 (Natural)", nullptr));
-        btnGenerateCast->setText(QCoreApplication::translate("MainWindow", "\320\241\320\263\320\265\320\275\320\265\321\200\320\270\321\200\320\276\320\262\320\260\321\202\321\214 \320\272\320\260\321\200\321\202\321\203 (Cast)", nullptr));
+        btnGenerateNatural->setText(QCoreApplication::translate("MainWindow", "\320\241\320\263\320\265\320\275\320\265\321\200\320\270\321\200\320\276\320\262\320\260\321\202\321\214 \320\276\320\261\321\213\321\207\320\275\321\203\321\216 \320\272\320\260\321\200\321\202\321\203", nullptr));
+        btnGenerateCast->setText(QCoreApplication::translate("MainWindow", "\320\241\320\263\320\265\320\275\320\265\321\200\320\270\321\200\320\276\320\262\320\260\321\202\321\214 \321\203\320\277\321\200\320\276\321\211\320\265\320\275\320\275\321\203\321\216 \320\272\320\260\321\200\321\202\321\203", nullptr));
         comboHero->setItemText(0, QCoreApplication::translate("MainWindow", "Human", nullptr));
         comboHero->setItemText(1, QCoreApplication::translate("MainWindow", "Wood Elf", nullptr));
         comboHero->setItemText(2, QCoreApplication::translate("MainWindow", "Orc", nullptr));
@@ -184,8 +178,7 @@ public:
         btnAddEdge->setText(QCoreApplication::translate("MainWindow", "\320\224\320\276\320\261\320\260\320\262\320\270\321\202\321\214 \321\201\320\262\321\217\320\267\321\214", nullptr));
         btnRemoveEdge->setText(QCoreApplication::translate("MainWindow", "\320\243\320\264\320\260\320\273\320\270\321\202\321\214 \321\201\320\262\321\217\320\267\321\214", nullptr));
         btnClearMap->setText(QCoreApplication::translate("MainWindow", "\320\236\321\207\320\270\321\201\321\202\320\270\321\202\321\214 \320\272\320\260\321\200\321\202\321\203", nullptr));
-        btnFindPathNatural->setText(QCoreApplication::translate("MainWindow", "\320\235\320\260\320\271\321\202\320\270 \320\277\321\203\321\202\321\214 (Natural)", nullptr));
-        btnFindPathCast->setText(QCoreApplication::translate("MainWindow", "\320\235\320\260\320\271\321\202\320\270 \320\277\321\203\321\202\321\214 (Cast)", nullptr));
+        btnFindPathNatural->setText(QCoreApplication::translate("MainWindow", "\320\235\320\260\320\271\321\202\320\270 \320\277\321\203\321\202\321\214", nullptr));
         lblStatus->setText(QCoreApplication::translate("MainWindow", "\320\241\321\202\320\260\321\202\321\203\321\201: \320\236\320\266\320\270\320\264\320\260\320\275\320\270\320\265", nullptr));
         legendGroup->setTitle(QCoreApplication::translate("MainWindow", "\320\233\320\265\320\263\320\265\320\275\320\264\320\260 \320\261\320\270\320\276\320\274\320\276\320\262", nullptr));
     } // retranslateUi

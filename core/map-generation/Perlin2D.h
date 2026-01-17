@@ -26,12 +26,11 @@ private:
         }
     }
 
-    // Кривая сглаживания: 6t^5 - 15t^4 + 10t^3
+    // кривая сглаживания: 6t^5 - 15t^4 + 10t^3
     static float quinticCurve(float t) {
         return t * t * t * (t * (t * 6 - 15) + 10);
     }
 
-    // Линейная интерполяция
     static float Lerp(float a, float b, float t) {
         return a + (b - a) * t;
     }
@@ -45,7 +44,7 @@ public:
             p[i] = i;
         }
 
-        std::mt19937 engine(seed); // Вихрь Мерсенна — качественный генератор
+        std::mt19937 engine(seed); // вихрь Мерсенна
         std::shuffle(p.begin(), p.begin() + 256, engine);
 
         for (int i = 0; i < 256; ++i) {
@@ -55,11 +54,11 @@ public:
 
     float Noise(float fx, float fy) const {
 
-        // Находим координаты клетки сетки (0..255)
+        // находим координаты клетки сетки (0..255)
         int X = static_cast<int>(std::floor(fx)) & 255;
         int Y = static_cast<int>(std::floor(fy)) & 255;
 
-        // Относительные координаты внутри клетки
+        // относительные координаты внутри клетки
         fx -= std::floor(fx);
         fy -= std::floor(fy);
 

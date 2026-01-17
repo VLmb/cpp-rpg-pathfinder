@@ -30,17 +30,17 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-           // Настройка сцены
+    // настройка сцены
     ui->mapView->setScene(scene);
     ui->mapView->viewport()->installEventFilter(this);
 
-           // Настройки зума и скролла
+    // настройки зума и скролла
     ui->mapView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
     ui->mapView->setResizeAnchor(QGraphicsView::AnchorUnderMouse);
     ui->mapView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->mapView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-           // === ЗАПОЛНЕНИЕ СПИСКА ГЕРОЕВ ===
+    // заполнение списка героев
     ui->comboHero->clear();
     ui->comboHero->addItem("");
 
@@ -69,8 +69,6 @@ MainWindow::~MainWindow()
     if (manager) delete manager;
     if (currentHero) delete currentHero;
 }
-
-// === Отрисовка и загрузка ===
 
 void MainWindow::reloadMapImage()
 {
@@ -156,8 +154,6 @@ void MainWindow::highlightCell(int gridX, int gridY)
     selectionRect->setVisible(true);
 }
 
-// === События ===
-
 bool MainWindow::eventFilter(QObject *watched, QEvent *event)
 {
     if (watched == ui->mapView->viewport()) {
@@ -174,12 +170,10 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
             return true;
         }
 
-               // Клики
         if (event->type() == QEvent::MouseButtonPress) {
             if (!manager) return false;
 
             QMouseEvent *me = static_cast<QMouseEvent*>(event);
-            // Исправлено предупреждение globalPos -> globalPosition().toPoint()
             QPointF scenePos = ui->mapView->mapToScene(me->pos());
 
             int gridX = static_cast<int>(scenePos.x() / cellStepX);
@@ -245,8 +239,7 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
                         double time = manager->findPathAndDraw(
                                 tempPoint1.x(), tempPoint1.y(),
                                 gridX, gridY,
-                                *currentHero,
-                                isCastMode
+                                *currentHero
                                 );
 
                         if (std::isinf(time)) {
@@ -317,13 +310,10 @@ void MainWindow::showContextMenu(const QPoint &screenPos, int gridX, int gridY)
     }
 }
 
-// === КНОПКИ ГЕНЕРАЦИИ ===
-
-// Новая функция, которая содержит общую логику диалога
 void MainWindow::runGenerationDialog(bool isCast)
 {
     QDialog dialog(this);
-    QString title = isCast ? "Параметры генерации (Cast)" : "Параметры генерации (Natural)";
+    QString title = isCast ? "Параметры генерации (Упрощенная)" : "Параметры генерации (Обычная)";
     dialog.setWindowTitle(title);
 
     QFormLayout form(&dialog);
@@ -355,12 +345,11 @@ void MainWindow::runGenerationDialog(bool isCast)
         userGridHeight = spinH->value();
         float scaleVal = static_cast<float>(spinScale->value());
 
-               // ВЫЗОВ КОНСТРУКТОРА С НОВЫМ ПАРАМЕТРОМ isCast
         manager = new PathfinderManager(
                 userGridWidth,
                 userGridHeight,
                 mapFileName,
-                isCast, // <--- Передаем сюда флаг
+                isCast,
                 scaleVal,
                 spinSeed->value()
                 );
@@ -368,12 +357,11 @@ void MainWindow::runGenerationDialog(bool isCast)
         manager->saveMapToFile();
         reloadMapImage();
 
-        QString modeStr = isCast ? "(Cast)" : "(Natural)";
+        QString modeStr = isCast ? "(Упрощенная)" : "(Обычная)";
         ui->lblStatus->setText("Карта сгенерирована " + modeStr);
     }
 }
 
-// Слоты для кнопок просто вызывают общую функцию с разными параметрами
 void MainWindow::on_btnGenerateNatural_clicked()
 {
     runGenerationDialog(false);
@@ -383,7 +371,6 @@ void MainWindow::on_btnGenerateCast_clicked()
 {
     runGenerationDialog(true);
 }
-// ==========================
 
 void MainWindow::on_btnAddEdge_clicked()
 {
@@ -415,8 +402,6 @@ void MainWindow::on_btnRemoveEdge_clicked()
     ui->lblStatus->setText("Удаление связи: выберите первую вершину");
 }
 
-// === КНОПКИ ПОИСКА ПУТИ ===
-
 void MainWindow::on_btnFindPathNatural_clicked()
 {
     if (!manager) return;
@@ -428,20 +413,6 @@ void MainWindow::on_btnFindPathNatural_clicked()
     currentState = AppState::SELECTING_PATH_1;
     ui->lblStatus->setText("Поиск (Natural): выберите старт");
 }
-
-void MainWindow::on_btnFindPathCast_clicked()
-{
-    if (!manager) return;
-    if (!currentHero) {
-        QMessageBox::warning(this, "Герой", "Сначала выберите героя из списка!");
-        return;
-    }
-    isCastMode = true;
-    currentState = AppState::SELECTING_PATH_1;
-    ui->lblStatus->setText("Поиск (Cast): выберите старт");
-}
-
-// ===================================
 
 void MainWindow::resetState()
 {

@@ -17,20 +17,20 @@
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
      <layout class="QVBoxLayout" name="verticalLayout">
-     <item>
-            <widget class="QPushButton" name="btnGenerateNatural">
-             <property name="text">
-              <string>Сгенерировать карту (Natural)</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="btnGenerateCast">
-             <property name="text">
-              <string>Сгенерировать карту (Cast)</string>
-             </property>
-            </widget>
-           </item>
+      <item>
+       <widget class="QPushButton" name="btnGenerateNatural">
+        <property name="text">
+         <string>Сгенерировать обычную карту</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnGenerateCast">
+        <property name="text">
+         <string>Сгенерировать упрощенную карту</string>
+        </property>
+       </widget>
+      </item>
       <item>
        <widget class="QComboBox" name="comboHero">
         <item>
@@ -63,12 +63,12 @@
        </widget>
       </item>
       <item>
-             <widget class="QPushButton" name="btnRemoveEdge">
-              <property name="text">
-               <string>Удалить связь</string>
-              </property>
-             </widget>
-            </item>
+       <widget class="QPushButton" name="btnRemoveEdge">
+        <property name="text">
+         <string>Удалить связь</string>
+        </property>
+       </widget>
+      </item>
       <item>
        <widget class="QPushButton" name="btnClearMap">
         <property name="text">
@@ -77,26 +77,19 @@
        </widget>
       </item>
       <item>
-             <widget class="QPushButton" name="btnFindPathNatural">
-              <property name="text">
-               <string>Найти путь (Natural)</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btnFindPathCast">
-              <property name="text">
-               <string>Найти путь (Cast)</string>
-              </property>
-             </widget>
-            </item>
+       <widget class="QPushButton" name="btnFindPathNatural">
+        <property name="text">
+         <string>Найти путь</string>
+        </property>
+       </widget>
+      </item>
       <item>
        <widget class="QLabel" name="lblStatus">
         <property name="text">
          <string>Статус: Ожидание</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+         <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -106,7 +99,7 @@
       <item>
        <spacer name="verticalSpacer">
         <property name="orientation">
-         <enum>Qt::Vertical</enum>
+         <enum>Qt::Orientation::Vertical</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -127,9 +120,6 @@
     </item>
     <item>
      <widget class="QGroupBox" name="legendGroup">
-      <property name="title">
-       <string>Легенда биомов</string>
-      </property>
       <property name="minimumSize">
        <size>
         <width>220</width>
@@ -142,6 +132,9 @@
         <height>16777215</height>
        </size>
       </property>
+      <property name="title">
+       <string>Легенда биомов</string>
+      </property>
       <layout class="QVBoxLayout" name="verticalLayout_Legend">
        <property name="leftMargin">
         <number>5</number>
@@ -151,19 +144,19 @@
        </property>
        <item>
         <widget class="QScrollArea" name="scrollAreaLegend">
+         <property name="frameShape">
+          <enum>QFrame::Shape::NoFrame</enum>
+         </property>
          <property name="widgetResizable">
           <bool>true</bool>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::NoFrame</enum>
          </property>
          <widget class="QWidget" name="scrollAreaWidgetContents">
           <property name="geometry">
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>200</width>
-            <height>500</height>
+            <width>234</width>
+            <height>596</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="legendLayoutContainer">
@@ -182,11 +175,10 @@
            <property name="bottomMargin">
             <number>0</number>
            </property>
-           <!-- Сюда мы будем добавлять элементы программно -->
            <item>
             <spacer name="verticalSpacerLegend">
              <property name="orientation">
-              <enum>Qt::Vertical</enum>
+              <enum>Qt::Orientation::Vertical</enum>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
@@ -211,7 +203,7 @@
      <x>0</x>
      <y>0</y>
      <width>1000</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

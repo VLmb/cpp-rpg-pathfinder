@@ -36,12 +36,12 @@ private:
         return path;
     }
 
-    virtual double getStepTime(Point cur, Point next, Hero& hero, bool castTerrain = false) const = 0;
+    virtual double getStepTime(Point cur, Point next, Hero& hero) const = 0;
 
 public:
     AStar() = default;
 
-    PathWithTime findPath(const Point& start, const Point& goal, Hero& hero, AbstractGraph* graph, bool castTerrain = false) override {
+    PathWithTime findPath(const Point& start, const Point& goal, Hero& hero, AbstractGraph* graph) override {
         if (!graph->inBounds(start) || !graph->inBounds(goal)) {
             throw std::invalid_argument("Start or goal point is out of bounds");
         }
@@ -77,7 +77,7 @@ public:
 
                 int neighborIdx = graph->indexOf(neighbor);
 
-                double stepTime = getStepTime(cur.point, neighbor, hero, castTerrain);
+                double stepTime = getStepTime(cur.point, neighbor, hero);
 
                 double newBestTime = bestTimeFromStart[currentIdx] + stepTime;
 

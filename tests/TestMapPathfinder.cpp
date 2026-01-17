@@ -8,7 +8,7 @@
 #include "../core/path-find/MapPathfinder.h"
 #include "TestUtils.h"
 
-static void fillGrid(Grid& grid, const CellProperty& cell) {
+static void fillGrid(Grid& grid, const WalkCell& cell) {
     for (int y = 0; y < grid.getHeight(); ++y) {
         for (int x = 0; x < grid.getWidth(); ++x) {
             grid.setCellType(x, y, cell);
@@ -19,7 +19,7 @@ static void fillGrid(Grid& grid, const CellProperty& cell) {
 void testMapStraightPath() {
     std::cout << "\n--- Running testMapStraightPath ---\n";
     Grid grid(3, 3);
-    CellProperty plain{1.0f, 1.0f, 1.0f};
+    WalkCell plain{1.0f, 1.0f, 1.0f};
     fillGrid(grid, plain);
 
     Human hero;
@@ -40,8 +40,8 @@ void testMapStraightPath() {
 void testMapAvoidsCostlyCell() {
     std::cout << "\n--- Running testMapAvoidsCostlyCell ---\n";
     Grid grid(3, 3);
-    CellProperty plain{1.0f, 1.0f, 1.0f};
-    CellProperty slow{0.001f, 0.001f, 0.001f}; // very slow cell
+    WalkCell plain{1.0f, 1.0f, 1.0f};
+    WalkCell slow{0.001f, 0.001f, 0.001f}; // very slow cell
     fillGrid(grid, plain);
     grid.setCellType(1, 1, slow);
 
@@ -65,7 +65,7 @@ void testMapAvoidsCostlyCell() {
 void testMapStartEqualsGoal() {
     std::cout << "\n--- Running testMapStartEqualsGoal ---\n";
     Grid grid(3, 3);
-    CellProperty plain{1.0f, 1.0f, 1.0f};
+    WalkCell plain{1.0f, 1.0f, 1.0f};
     fillGrid(grid, plain);
 
     Human hero;
@@ -84,7 +84,7 @@ void testMapStartEqualsGoal() {
 void testMapInvalidPoints() {
     std::cout << "\n--- Running testMapInvalidPoints ---\n";
     Grid grid(3, 3);
-    CellProperty plain{1.0f, 1.0f, 1.0f};
+    WalkCell plain{1.0f, 1.0f, 1.0f};
     fillGrid(grid, plain);
 
     Human hero;

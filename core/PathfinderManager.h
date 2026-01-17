@@ -8,7 +8,6 @@
 #include "view/MapRenderer.h"
 #include "model/Hero.h"
 
-
 class PathfinderManager {
 private:
     static constexpr int MIN_DIMENSION = 1;
@@ -23,7 +22,7 @@ private:
 
     std::string fileName;
 
-    bool isCastMap;
+    bool isSimplifiedMap;
 
     int getMultiplier(Point checkpoint) {
         return map_generator::getMultFromCheckpointToPixels(graph->getWidth(), graph->getHeight());
@@ -42,7 +41,7 @@ public:
         std::unique_ptr<GraphPathfinder> graphPathfinder,
         std::unique_ptr<MapRenderer> mapRenderer,
         const std::string& filename,
-        bool isCastMap = false
+        bool isSimplifiedMap = false
         )
     : grid(std::move(grid)),
     graph(std::move(graph)),
@@ -55,7 +54,7 @@ public:
     }
 
     PathfinderManager(
-        int width, int height, const std::string& filename, bool isCastMap = false,
+        int width, int height, const std::string& filename, bool isSimplifiedMap = false,
         double scale = 0.0f, int seed = 12345) {
 
         if (width < MIN_DIMENSION &&
@@ -67,13 +66,13 @@ public:
         }
 
         perlin = std::make_unique<Perlin2D>(seed);
-        auto map = isCastMap
-                ? map_generator::generateCastMap(width, height, perlin.get(), scale)
+        auto map = isSimplifiedMap
+                ? map_generator::generateSimplifiedMap(width, height, perlin.get(), scale)
                 : map_generator::generateNaturalMap(width, height, perlin.get(), scale);
         grid = std::make_unique<Grid>(map, map_generator::getGridScale(width, height));
         mapPathfinder = std::make_unique<MapPathfinder>(grid.get());
         graph = std::make_unique<CheckpointGraph>(width, height);
-        graphPathfinder = std::make_unique<GraphPathfinder>( graph.get(), mapPathfinder.get());
+        graphPathfinder = std::make_unique<GraphPathfinder>(graph.get(), mapPathfinder.get());
         mapRenderer = std::make_unique<MapRenderer>(map);
 
         fileName = filename;
@@ -112,7 +111,7 @@ public:
         mapRenderer->undrawGraphVertices(
             getMappedPixelsCoordinate(checkpoint),
             getMultiplier(checkpoint)
-            );
+        );
         mapRenderer->saveModifiedMap(fileName);
         return f;
     }
@@ -131,32 +130,32 @@ public:
         return removeEdgeFromCheckpointGraph(Point{x1,y1}, Point{x2,y2});
     }
 
-    std::vector<Point> findGridPath(Point checkpoint1, Point checkpoint2, Hero& hero, bool castTerrain = false) {
+    std::vector<Point> findGridPath(Point checkpoint1, Point checkpoint2, Hero& hero) {
         if (!graph->pointIsVertex(checkpoint1) || !graph->pointIsVertex(checkpoint2)) {
             throw std::invalid_argument("Checkpoint graph does not have such vertex.");
         }
 
-        auto pathWithTime = graphPathfinder->findPath(checkpoint1, checkpoint2, hero, castTerrain);
+        auto pathWithTime = graphPathfinder->findPath(checkpoint1, checkpoint2, hero);
 
         auto gridPath = mapPathfinder->makeGridPathFromCheckpointsPath(pathWithTime.path, hero);
 
         return gridPath;
     }
 
-    double findPathAndDraw(Point checkpoint1, Point checkpoint2, Hero& hero, bool castTerrain = false) {
-        auto pathWithTime = graphPathfinder->findPath(checkpoint1, checkpoint2, hero, castTerrain);
+    double findPathAndDraw(Point checkpoint1, Point checkpoint2, Hero& hero) {
+        auto pathWithTime = graphPathfinder->findPath(checkpoint1, checkpoint2, hero);
         auto path = pathWithTime.path;
         auto gridPath = mapPathfinder->makeGridPathFromCheckpointsPath(path, hero);
         mapRenderer->drawPath(
             gridPath,
             hero,
             grid->getGridFactor()
-            );
+        );
         mapRenderer->saveModifiedMap(fileName);
         return pathWithTime.time;
     }
 
-    double findPathAndDraw(int x1, int y1, int x2, int y2, Hero& hero, bool castTerrain = false) {
+    double findPathAndDraw(int x1, int y1, int x2, int y2, Hero& hero) {
         return findPathAndDraw(Point{x1, y1}, Point{x2, y2}, hero);
     }
 
@@ -183,8 +182,8 @@ public:
     void drawAllCheckpoints() {
         for (auto checkpoint: graph->getVerticesList()) {
             mapRenderer->drawGraphVertices(
-            getMappedPixelsCoordinate(checkpoint),
-            getMultiplier(checkpoint)
+                getMappedPixelsCoordinate(checkpoint),
+                getMultiplier(checkpoint)
             );
         }
     }

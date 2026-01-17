@@ -41,24 +41,14 @@ protected:
 public:
     virtual ~Hero() = default;
 
-    double getSpeed(CellProperty terrain) const {
+    double getSpeed(WalkCell terrain) const {
         return (terrain.temperatureAvg * temperaturePreference +
                 terrain.altitudeAvg * altitudePreference +
                 terrain.moistureAvg * moisturePreference) * baseSpeed / 3.0f;
     }
 
-    double getSpeedByCastTerrain(CellProperty terrain) const {
-        return (terrain.castTemperatureAvg * temperaturePreference +
-                terrain.castAltitudeAvg * altitudePreference +
-                terrain.castMoistureAvg * moisturePreference) * baseSpeed / 3.0f;
-    }
-
-    double getTimeToCross(CellProperty terrain) const {
+    double getTimeToCross(WalkCell terrain) const {
         return 100.0f / getSpeed(terrain);
-    }
-
-    double getTimeToCrossCastTerrain(CellProperty terrain) const {
-        return 100.0f / getSpeedByCastTerrain(terrain);
     }
 
     double getMaxTimeToCross() const {

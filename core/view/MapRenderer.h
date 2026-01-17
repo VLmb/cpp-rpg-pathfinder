@@ -111,7 +111,7 @@ private:
 
 
 public:
-    MapRenderer(const std::vector<std::vector<map_generator::TerrainType>>& map) {
+    MapRenderer(const std::vector<std::vector<map_generator::PixelCell>>& map) {
         if (map.empty()) {
             map_height = 0; map_width = 0;
             return;
