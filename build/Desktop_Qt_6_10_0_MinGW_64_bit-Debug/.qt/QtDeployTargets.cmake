@@ -1,5 +1,0 @@
-set(__QT_DEPLOY_TARGET_CoreLogic_FILE D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/build/Desktop_Qt_6_10_0_MinGW_64_bit-Debug/core/libCoreLogic.a)
-set(__QT_DEPLOY_TARGET_CoreLogic_TYPE STATIC_LIBRARY)
-set(__QT_DEPLOY_TARGET_MapPathfinderApp_FILE D:/Programming/Prog_Cpp/lab-assignment-3d-term/cpp-rpg-pathfinder/build/Desktop_Qt_6_10_0_MinGW_64_bit-Debug/gui/MapPathfinderApp.exe)
-set(__QT_DEPLOY_TARGET_MapPathfinderApp_TYPE EXECUTABLE)
-set(__QT_DEPLOY_TARGET_MapPathfinderApp_RUNTIME_DLLS D:/Apps/QT/6.10.0/mingw_64/bin/Qt6Widgets.dll;D:/Apps/QT/6.10.0/mingw_64/bin/Qt6Gui.dll;D:/Apps/QT/6.10.0/mingw_64/bin/Qt6Core.dll)
