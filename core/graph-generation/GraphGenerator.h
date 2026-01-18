@@ -68,23 +68,30 @@ private:
     }
 
     static void connectNeighbors(CheckpointGraph& graph, const GridMap& grid, const GridConfig& cfg, double prob) {
+        double diagProb = prob * 0.65;
+
         for (int c = 0; c < cfg.cols; ++c) {
             for (int r = 0; r < cfg.rows; ++r) {
                 if (!grid[c][r].exists) continue;
 
                 Point currentP = grid[c][r].p;
 
-                auto tryConnect = [&](int nc, int nr) {
-                    if (nc >= cfg.cols || nr >= cfg.rows) return;
+                auto tryConnect = [&](int nc, int nr, double probability) {
+                    if (nc < 0 || nc >= cfg.cols || nr < 0 || nr >= cfg.rows) return;
 
                     const auto& neighbor = grid[nc][nr];
-                    if (neighbor.exists && randomChance(prob)) {
+
+                    if (neighbor.exists && randomChance(probability)) {
                         graph.addEdge(currentP, neighbor.p);
                     }
                 };
 
-                tryConnect(c + 1, r);
-                tryConnect(c, r + 1);
+                tryConnect(c + 1, r, prob);
+                tryConnect(c, r + 1, prob);
+
+                tryConnect(c + 1, r + 1, diagProb);
+
+                tryConnect(c - 1, r + 1, diagProb);
             }
         }
     }

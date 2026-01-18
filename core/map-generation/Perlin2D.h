@@ -10,7 +10,7 @@ class Perlin2D {
 private:
     std::vector<int> p; 
 
-    static float Grad(int hash, float x, float y) {
+    static float grad(int hash, float x, float y) {
 
         int h = hash & 7; 
         
@@ -54,29 +54,23 @@ public:
 
     float noise(float fx, float fy) const {
 
-        // находим координаты клетки сетки (0..255)
         int X = static_cast<int>(std::floor(fx)) & 255;
         int Y = static_cast<int>(std::floor(fy)) & 255;
 
-        // относительные координаты внутри клетки
         fx -= std::floor(fx);
         fy -= std::floor(fy);
 
-        // Вычисляем кривые сглаживания
         float u = quinticCurve(fx);
         float v = quinticCurve(fy);
 
-        // хэширование углов квадрата через таблицу перестановок
         int A = p[X] + Y;
         int B = p[X + 1] + Y;
 
-        // скалярные произведения для углов
-        float aa = Grad(p[A], fx, fy);
-        float ab = Grad(p[A + 1], fx, fy - 1);
-        float ba = Grad(p[B], fx - 1, fy);
-        float bb = Grad(p[B + 1], fx - 1, fy - 1);
+        float aa = grad(p[A], fx, fy);
+        float ab = grad(p[A + 1], fx, fy - 1);
+        float ba = grad(p[B], fx - 1, fy);
+        float bb = grad(p[B + 1], fx - 1, fy - 1);
 
-        // интерполяция
         float res = lerp(
             lerp(aa, ba, u),
             lerp(ab, bb, u),
@@ -86,7 +80,7 @@ public:
         return res;
     }
 
-    // шум с октавами (Фрактальный броуновское движение)
+    // шум с октавами
     float noise(float fx, float fy, int octaves, float persistence = 0.5f) const {
         float amplitude = 1.0f;
         float max = 0.0f;

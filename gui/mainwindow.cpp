@@ -314,8 +314,8 @@ void MainWindow::runGenerationDialog(bool isCast)
 
     QFormLayout form(&dialog);
 
-    QSpinBox *spinW = new QSpinBox(&dialog); spinW->setRange(2, 2000); spinW->setValue(40);
-    QSpinBox *spinH = new QSpinBox(&dialog); spinH->setRange(2, 2000); spinH->setValue(30);
+    QSpinBox *spinW = new QSpinBox(&dialog); spinW->setRange(2, 2000); spinW->setValue(50);
+    QSpinBox *spinH = new QSpinBox(&dialog); spinH->setRange(2, 2000); spinH->setValue(40);
 
     QDoubleSpinBox *spinScale = new QDoubleSpinBox(&dialog);
     spinScale->setRange(0.0, 500.0);

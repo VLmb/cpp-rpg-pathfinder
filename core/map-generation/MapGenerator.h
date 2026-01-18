@@ -160,14 +160,14 @@ namespace  map_generator {
         double minA = 1000.0f, maxA = -1000.0f;
         double minM = 1000.0f, maxM = -1000.0f;
 
-        const int OFFSET_R = map_config::OFFSET_TEMPERATURE;
-        const int OFFSET_V = map_config::OFFSET_ALTITUDE;
+        const int OFFSET_T = map_config::OFFSET_TEMPERATURE;
+        const int OFFSET_A = map_config::OFFSET_ALTITUDE;
         const int OFFSET_M = map_config::OFFSET_MOISTURE;
 
         for (int y = 0; y < modifiedHeight; y++) {
             for (int x = 0; x < modifiedWidth; x++) {
-                double tVal = perlin->noise((x + OFFSET_R) / scale, (y + OFFSET_R) / scale, map_config::TEMP_OCTAVES, map_config::TEMP_PERSISTENCE);
-                double aVal = perlin->noise((x + OFFSET_V) / scale, (y + OFFSET_V) / scale, map_config::ALT_OCTAVES, map_config::ALT_PERSISTENCE);
+                double tVal = perlin->noise((x + OFFSET_T) / scale, (y + OFFSET_T) / scale, map_config::TEMP_OCTAVES, map_config::TEMP_PERSISTENCE);
+                double aVal = perlin->noise((x + OFFSET_A) / scale, (y + OFFSET_A) / scale, map_config::ALT_OCTAVES, map_config::ALT_PERSISTENCE);
                 double mVal = perlin->noise((x + OFFSET_M) / scale, (y + OFFSET_M) / scale, map_config::MOIST_OCTAVES, map_config::MOIST_PERSISTENCE);
 
                 if (tVal < minT) minT = tVal; if (tVal > maxT) maxT = tVal;
