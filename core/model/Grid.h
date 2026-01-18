@@ -33,7 +33,7 @@ public:
     }
 
     Grid(std::vector<std::vector<map_generator::PixelCell>>& map, const int grid_scale = 1)
-        : Grid(static_cast<int>(map[0].size()) / map_generator::GRID_FACTOR, static_cast<int>(map.size()) / map_generator::GRID_FACTOR, grid_scale) {
+        : Grid(static_cast<int>(map[0].size()) / map_config::GRID_BLOCK_SIZE, static_cast<int>(map.size()) / map_config::GRID_BLOCK_SIZE, grid_scale) {
 
         this->map = map;
         this->grid_scale = grid_scale;
@@ -49,8 +49,8 @@ public:
 
                 float T = 0.0f, A = 0.0f, M = 0.0f;
 
-                for (int dy = 0; dy < map_generator::GRID_FACTOR; ++dy) {
-                    for (int dx = 0; dx < map_generator::GRID_FACTOR; ++dx) {
+                for (int dy = 0; dy < map_config::GRID_BLOCK_SIZE; ++dy) {
+                    for (int dx = 0; dx < map_config::GRID_BLOCK_SIZE; ++dx) {
                         const auto& s = map[srcY + dy][srcX + dx];
                         T += s.temperature;
                         A += s.altitude;
@@ -58,13 +58,13 @@ public:
                     }
                 }
 
-                const int x = srcX / map_generator::GRID_FACTOR;
-                const int y = srcY / map_generator::GRID_FACTOR;
+                const int x = srcX / map_config::GRID_BLOCK_SIZE;
+                const int y = srcY / map_config::GRID_BLOCK_SIZE;
 
                 WalkCell c;
-                c.temperatureAvg = T / static_cast<float>(map_generator::GRID_FACTOR * map_generator::GRID_FACTOR);
-                c.altitudeAvg = A / static_cast<float>(map_generator::GRID_FACTOR * map_generator::GRID_FACTOR);
-                c.moistureAvg = M / static_cast<float>(map_generator::GRID_FACTOR * map_generator::GRID_FACTOR);
+                c.temperatureAvg = T / static_cast<float>(map_config::GRID_BLOCK_SIZE * map_config::GRID_BLOCK_SIZE);
+                c.altitudeAvg = A / static_cast<float>(map_config::GRID_BLOCK_SIZE * map_config::GRID_BLOCK_SIZE);
+                c.moistureAvg = M / static_cast<float>(map_config::GRID_BLOCK_SIZE * map_config::GRID_BLOCK_SIZE);
 
                 cells[indexOf(Point{ x, y })] = c;
             }
@@ -112,6 +112,6 @@ public:
     }
 
     int getGridFactor() const {
-        return map_generator::GRID_FACTOR;
+        return map_config::GRID_BLOCK_SIZE;
     }
 };

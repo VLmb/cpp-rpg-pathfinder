@@ -31,7 +31,7 @@ private:
         return t * t * t * (t * (t * 6 - 15) + 10);
     }
 
-    static float Lerp(float a, float b, float t) {
+    static float lerp(float a, float b, float t) {
         return a + (b - a) * t;
     }
 
@@ -52,7 +52,7 @@ public:
         }
     }
 
-    float Noise(float fx, float fy) const {
+    float noise(float fx, float fy) const {
 
         // находим координаты клетки сетки (0..255)
         int X = static_cast<int>(std::floor(fx)) & 255;
@@ -66,35 +66,35 @@ public:
         float u = quinticCurve(fx);
         float v = quinticCurve(fy);
 
-        // Хэширование углов квадрата через таблицу перестановок
+        // хэширование углов квадрата через таблицу перестановок
         int A = p[X] + Y;
         int B = p[X + 1] + Y;
 
-        // Вычисляем скалярные произведения для 4 углов
+        // скалярные произведения для углов
         float aa = Grad(p[A], fx, fy);
         float ab = Grad(p[A + 1], fx, fy - 1);
         float ba = Grad(p[B], fx - 1, fy);
         float bb = Grad(p[B + 1], fx - 1, fy - 1);
 
-        // Интерполяция
-        float res = Lerp(
-            Lerp(aa, ba, u),
-            Lerp(ab, bb, u),
+        // интерполяция
+        float res = lerp(
+            lerp(aa, ba, u),
+            lerp(ab, bb, u),
             v
         );
 
         return res;
     }
 
-    // Шум с октавами (Фрактальный броуновское движение)
-    float Noise(float fx, float fy, int octaves, float persistence = 0.5f) const {
+    // шум с октавами (Фрактальный броуновское движение)
+    float noise(float fx, float fy, int octaves, float persistence = 0.5f) const {
         float amplitude = 1.0f;
         float max = 0.0f;
         float result = 0.0f;
 
         while (octaves-- > 0) {
             max += amplitude;
-            result += Noise(fx, fy) * amplitude;
+            result += noise(fx, fy) * amplitude;
             amplitude *= persistence;
             fx *= 2.0f;
             fy *= 2.0f;

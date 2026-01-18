@@ -39,6 +39,7 @@ public:
 private slots:
     void on_btnGenerateNatural_clicked();
     void on_btnGenerateCast_clicked();
+    void on_btnGenerateGraph_clicked();
     void on_btnAddEdge_clicked();
     void on_btnClearMap_clicked();
     void on_btnRemoveEdge_clicked();

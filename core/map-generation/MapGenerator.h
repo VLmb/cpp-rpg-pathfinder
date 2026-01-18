@@ -33,27 +33,27 @@ namespace  map_generator {
     };
 
     inline double getCastTemperature(double temperature) {
-        if (temperature > map_generator_config::SIMPLIFIED_TEMPERATURE_THRESHOLD) {
-            return map_generator_config::SIMPLIFIED_HIGH_VALUE;
+        if (temperature > map_config::SIMPLIFIED_TEMPERATURE_THRESHOLD) {
+            return map_config::SIMPLIFIED_HIGH_VALUE;
         }
-        return map_generator_config::SIMPLIFIED_LOW_VALUE;
+        return map_config::SIMPLIFIED_LOW_VALUE;
     }
 
     inline double getCastAltitude(double altitude) {
-        if (altitude < map_generator_config::SIMPLIFIED_ALTITUDE_LOW_THRESHOLD) {
-            return map_generator_config::SIMPLIFIED_LOW_VALUE;
+        if (altitude < map_config::SIMPLIFIED_ALTITUDE_LOW_THRESHOLD) {
+            return map_config::SIMPLIFIED_LOW_VALUE;
         }
-        if (altitude < map_generator_config::SIMPLIFIED_ALTITUDE_MID_THRESHOLD) {
-            return map_generator_config::SIMPLIFIED_MID_VALUE;
+        if (altitude < map_config::SIMPLIFIED_ALTITUDE_MID_THRESHOLD) {
+            return map_config::SIMPLIFIED_MID_VALUE;
         }
-        return map_generator_config::SIMPLIFIED_HIGH_VALUE;
+        return map_config::SIMPLIFIED_HIGH_VALUE;
     }
 
     inline double getCastMoisture(double moisture) {
-        if (moisture > map_generator_config::SIMPLIFIED_MOISTURE_THRESHOLD) {
-            return map_generator_config::SIMPLIFIED_HIGH_VALUE;
+        if (moisture > map_config::SIMPLIFIED_MOISTURE_THRESHOLD) {
+            return map_config::SIMPLIFIED_HIGH_VALUE;
         }
-        return map_generator_config::SIMPLIFIED_LOW_VALUE;
+        return map_config::SIMPLIFIED_LOW_VALUE;
     }
 
     inline BiomeType getBiomeType(
@@ -63,30 +63,30 @@ namespace  map_generator {
 
         BiomeType type;
 
-         if (altitude < map_generator_config::ALTITUDE_LOW_THRESHOLD) {
-            if (temperature > map_generator_config::TEMPERATURE_WARM_THRESHOLD) {
-                if (moisture > map_generator_config::MOISTURE_WET_THRESHOLD) {
+         if (altitude < map_config::ALTITUDE_LOW_THRESHOLD) {
+            if (temperature > map_config::TEMPERATURE_WARM_THRESHOLD) {
+                if (moisture > map_config::MOISTURE_WET_THRESHOLD) {
                     type = BiomeType::FOREST;
                 } else {
                     type = BiomeType::PLAIN;
                 }
             } else {
-                if (moisture > map_generator_config::MOISTURE_WET_THRESHOLD) {
+                if (moisture > map_config::MOISTURE_WET_THRESHOLD) {
                     type = BiomeType::WINTER_FOREST;
                 } else {
                     type = BiomeType::WINTER_PLAIN;
                 }
             }
         }
-        else if (altitude < map_generator_config::ALTITUDE_MID_THRESHOLD) {
-            if (temperature > map_generator_config::TEMPERATURE_WARM_THRESHOLD) {
-                if (moisture > map_generator_config::MOISTURE_WET_THRESHOLD) {
+        else if (altitude < map_config::ALTITUDE_MID_THRESHOLD) {
+            if (temperature > map_config::TEMPERATURE_WARM_THRESHOLD) {
+                if (moisture > map_config::MOISTURE_WET_THRESHOLD) {
                     type = BiomeType::HILLY_JUNGLE;
                 } else {
                     type = BiomeType::HILLS;
                 }
             } else {
-                if (moisture > map_generator_config::MOISTURE_WET_THRESHOLD) {
+                if (moisture > map_config::MOISTURE_WET_THRESHOLD) {
                     type = BiomeType::HILLY_WINTER_FOREST;
                 } else {
                     type = BiomeType::WINTER_HILLS;
@@ -94,14 +94,14 @@ namespace  map_generator {
             }
         }
         else {
-            if (temperature > map_generator_config::TEMPERATURE_WARM_THRESHOLD) {
-                if (moisture > map_generator_config::MOISTURE_WET_THRESHOLD) {
+            if (temperature > map_config::TEMPERATURE_WARM_THRESHOLD) {
+                if (moisture > map_config::MOISTURE_WET_THRESHOLD) {
                     type = BiomeType::ROCKY_PEAKS;
                 } else {
                     type = BiomeType::ROCKY_PEAKS;
                 }
             } else {
-                if (moisture > map_generator_config::MOISTURE_SNOWY_ROCKS_THRESHOLD) {
+                if (moisture > map_config::MOISTURE_SNOWY_ROCKS_THRESHOLD) {
                     type = BiomeType::SNOWY_ROCKS;
                 } else {
                     type = BiomeType::ROCKY_PEAKS;
@@ -111,49 +111,37 @@ namespace  map_generator {
         return type;
     }
 
-    inline constexpr double SIZE_T1 = map_generator_config::SIZE_THRESHOLD_SMALL;
-    inline constexpr double SIZE_T2 = map_generator_config::SIZE_THRESHOLD_MEDIUM;
-
-    inline constexpr double SCALE_T1 = map_generator_config::DEFAULT_SCALE_SMALL;
-    inline constexpr double SCALE_T2 = map_generator_config::DEFAULT_SCALE_MEDIUM;
-    inline constexpr double SCALE_T3 = map_generator_config::DEFAULT_SCALE_LARGE;
-
-    inline constexpr int FACTOR_T1 = map_generator_config::PIXEL_UPSCALE_SMALL;
-    inline constexpr int FACTOR_T2 = map_generator_config::PIXEL_UPSCALE_MEDIUM;
-    inline constexpr int FACTOR_T3 = map_generator_config::PIXEL_UPSCALE_LARGE;
-    inline constexpr int GRID_FACTOR = map_generator_config::GRID_BLOCK_SIZE;
-
     inline void calculateParams(int& modifiedWidth, int& modifiedHeight, double& scale) {
         int minSize = std::min(modifiedWidth, modifiedHeight);
-        if (minSize < SIZE_T1) {
-            scale = (scale == 0.0f) ? SCALE_T1 : scale;
-            modifiedWidth *= FACTOR_T1 * GRID_FACTOR;
-            modifiedHeight *= FACTOR_T1 * GRID_FACTOR;
-        } else if (minSize < SIZE_T2) {
-            scale = (scale == 0.0f) ? SCALE_T2 : scale;
-            modifiedWidth *= FACTOR_T2 * GRID_FACTOR;
-            modifiedHeight *= FACTOR_T2 * GRID_FACTOR;
+        if (minSize < map_config::SIZE_THRESHOLD_SMALL) {
+            scale = (scale == 0.0f) ? map_config::DEFAULT_SCALE_SMALL : scale;
+            modifiedWidth *= map_config::PIXEL_UPSCALE_SMALL * map_config::GRID_BLOCK_SIZE;
+            modifiedHeight *= map_config::PIXEL_UPSCALE_SMALL * map_config::GRID_BLOCK_SIZE;
+        } else if (minSize < map_config::SIZE_THRESHOLD_MEDIUM) {
+            scale = (scale == 0.0f) ? map_config::DEFAULT_SCALE_MEDIUM : scale;
+            modifiedWidth *= map_config::PIXEL_UPSCALE_MEDIUM * map_config::GRID_BLOCK_SIZE;
+            modifiedHeight *= map_config::PIXEL_UPSCALE_MEDIUM * map_config::GRID_BLOCK_SIZE;
         } else {
-            scale = (scale == 0.0f) ? SCALE_T3 : scale;
-            modifiedWidth *= FACTOR_T3 * GRID_FACTOR;
-            modifiedHeight *= FACTOR_T3 * GRID_FACTOR;
+            scale = (scale == 0.0f) ? map_config::DEFAULT_SCALE_LARGE : scale;
+            modifiedWidth *= map_config::PIXEL_UPSCALE_LARGE * map_config::GRID_BLOCK_SIZE;
+            modifiedHeight *= map_config::PIXEL_UPSCALE_LARGE * map_config::GRID_BLOCK_SIZE;
         }
     }
 
     inline int getGridScale(int width, int height) {
         int minSize = std::min(width, height);
-        if (minSize < SIZE_T1) {
-            return FACTOR_T1;
+        if (minSize < map_config::SIZE_THRESHOLD_SMALL) {
+            return map_config::PIXEL_UPSCALE_SMALL;
         }
-        if (minSize < SIZE_T2) {
-            return FACTOR_T2;
+        if (minSize < map_config::SIZE_THRESHOLD_MEDIUM) {
+            return map_config::PIXEL_UPSCALE_MEDIUM;
         }
 
-        return FACTOR_T3;
+        return map_config::PIXEL_UPSCALE_LARGE;
     }
 
     inline int getMultFromCheckpointToPixels(int width, int height) {
-        return getGridScale(width, height) * GRID_FACTOR;
+        return getGridScale(width, height) * map_config::GRID_BLOCK_SIZE;
     }
 
     inline const auto& normalize = [](double val, double mmin, double mmax) -> double {
@@ -172,15 +160,15 @@ namespace  map_generator {
         double minA = 1000.0f, maxA = -1000.0f;
         double minM = 1000.0f, maxM = -1000.0f;
 
-        const int OFFSET_R = map_generator_config::OFFSET_TEMPERATURE;
-        const int OFFSET_V = map_generator_config::OFFSET_ALTITUDE;
-        const int OFFSET_M = map_generator_config::OFFSET_MOISTURE;
+        const int OFFSET_R = map_config::OFFSET_TEMPERATURE;
+        const int OFFSET_V = map_config::OFFSET_ALTITUDE;
+        const int OFFSET_M = map_config::OFFSET_MOISTURE;
 
         for (int y = 0; y < modifiedHeight; y++) {
             for (int x = 0; x < modifiedWidth; x++) {
-                double tVal = perlin->Noise((x + OFFSET_R) / scale, (y + OFFSET_R) / scale, map_generator_config::TEMP_OCTAVES, map_generator_config::TEMP_PERSISTENCE);
-                double aVal = perlin->Noise((x + OFFSET_V) / scale, (y + OFFSET_V) / scale, map_generator_config::ALT_OCTAVES, map_generator_config::ALT_PERSISTENCE);
-                double mVal = perlin->Noise((x + OFFSET_M) / scale, (y + OFFSET_M) / scale, map_generator_config::MOIST_OCTAVES, map_generator_config::MOIST_PERSISTENCE);
+                double tVal = perlin->noise((x + OFFSET_R) / scale, (y + OFFSET_R) / scale, map_config::TEMP_OCTAVES, map_config::TEMP_PERSISTENCE);
+                double aVal = perlin->noise((x + OFFSET_V) / scale, (y + OFFSET_V) / scale, map_config::ALT_OCTAVES, map_config::ALT_PERSISTENCE);
+                double mVal = perlin->noise((x + OFFSET_M) / scale, (y + OFFSET_M) / scale, map_config::MOIST_OCTAVES, map_config::MOIST_PERSISTENCE);
 
                 if (tVal < minT) minT = tVal; if (tVal > maxT) maxT = tVal;
                 if (aVal < minA) minA = aVal; if (aVal > maxA) maxA = aVal;
@@ -192,9 +180,9 @@ namespace  map_generator {
             }
         }
 
-        if (maxT == minT) maxT += map_generator_config::NORMALIZE_EPS;
-        if (maxA == minA) maxA += map_generator_config::NORMALIZE_EPS;
-        if (maxM == minM) maxM += map_generator_config::NORMALIZE_EPS;
+        if (maxT == minT) maxT += map_config::NORMALIZE_EPS;
+        if (maxA == minA) maxA += map_config::NORMALIZE_EPS;
+        if (maxM == minM) maxM += map_config::NORMALIZE_EPS;
 
         for (int y = 0; y < modifiedHeight; y++) {
             for (int x = 0; x < modifiedWidth; x++) {
@@ -224,11 +212,11 @@ namespace  map_generator {
         std::vector<std::vector<double>> castMap(modifiedHeight, std::vector<double>(modifiedWidth));
         for (int y = 0; y < modifiedHeight; y++) {
             for (int x = 0; x < modifiedWidth; x++) {
-                double val = perlin->Noise(
-                    x / (scale * map_generator_config::SIMPLIFIED_SCALE_X_MULT),
-                    y / (scale * map_generator_config::SIMPLIFIED_SCALE_Y_MULT),
-                    map_generator_config::SIMPLIFIED_OCTAVES,
-                    map_generator_config::SIMPLIFIED_PERSISTENCE
+                double val = perlin->noise(
+                    x / (scale * map_config::SIMPLIFIED_SCALE_X_MULT),
+                    y / (scale * map_config::SIMPLIFIED_SCALE_Y_MULT),
+                    map_config::SIMPLIFIED_OCTAVES,
+                    map_config::SIMPLIFIED_PERSISTENCE
                 );
 
                 mmin = std::min(mmin, val);
@@ -239,14 +227,14 @@ namespace  map_generator {
         }
 
         if (mmin == mmax) {
-            mmax += map_generator_config::NORMALIZE_EPS;
+            mmax += map_config::NORMALIZE_EPS;
         }
 
         for (int y = 0; y < modifiedHeight; y++) {
             for (int x = 0; x < modifiedWidth; x++) {
                 castMap[y][x] = normalize(castMap[y][x], mmin, mmax);
 
-                if (castMap[y][x] > map_generator_config::SIMPLIFIED_CLASS_HIGH_THRESHOLD) {
+                if (castMap[y][x] > map_config::SIMPLIFIED_CLASS_HIGH_THRESHOLD) {
                     map[y][x].temperature = 1.0;
                     map[y][x].altitude = 0.1;
                     map[y][x].moisture = 0.1;
@@ -255,7 +243,7 @@ namespace  map_generator {
                         map[y][x].altitude,
                         map[y][x].moisture
                         );
-                } else if (castMap[y][x] > map_generator_config::SIMPLIFIED_CLASS_MID_THRESHOLD) {
+                } else if (castMap[y][x] > map_config::SIMPLIFIED_CLASS_MID_THRESHOLD) {
                     map[y][x].temperature = 0.1;
                     map[y][x].altitude = 1.0;
                     map[y][x].moisture = 0.1;

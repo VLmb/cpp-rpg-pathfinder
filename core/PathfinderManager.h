@@ -1,12 +1,13 @@
 #pragma once
 #include <memory>
 
+#include "graph-generation/GraphGenerator.h"
 #include "model/CheckpointGraph.h"
 #include "model/Grid.h"
+#include "model/Hero.h"
 #include "path-find/GraphPathfinder.h"
 #include "path-find/MapPathfinder.h"
 #include "view/MapRenderer.h"
-#include "model/Hero.h"
 
 class PathfinderManager {
 private:
@@ -24,11 +25,11 @@ private:
 
     bool isSimplifiedMap;
 
-    int getMultiplier(Point checkpoint) {
+    int getMultiplier(Point checkpoint) const {
         return map_generator::getMultFromCheckpointToPixels(graph->getWidth(), graph->getHeight());
     }
 
-    Point getMappedPixelsCoordinate(Point checkpoint) {
+    Point getMappedPixelsCoordinate(Point checkpoint) const {
         int multiplier = getMultiplier(checkpoint);
         return Point{checkpoint.x * multiplier, checkpoint.y * multiplier};
     }
@@ -48,10 +49,10 @@ public:
     perlin(std::move(perlin)),
     mapPathfinder(std::move(mapPathfinder)),
     fileName(filename),
+    isSimplifiedMap(isSimplifiedMap),
+    mapRenderer(std::move(mapRenderer)),
     graphPathfinder(std::move(graphPathfinder)
-    ) {
-        this->mapRenderer = std::move(mapRenderer);
-    }
+    ) { }
 
     PathfinderManager(
         int width, int height, const std::string& filename, bool isSimplifiedMap = false,
@@ -76,13 +77,15 @@ public:
         mapRenderer = std::make_unique<MapRenderer>(map);
 
         fileName = filename;
+
+        this->isSimplifiedMap = isSimplifiedMap;
     }
 
-    void saveMapToFile() {
+    void saveMapToFile() const {
         mapRenderer->saveModifiedMap(fileName);
     }
 
-    bool addVertexToCheckpointGraph(Point checkpoint) {
+    bool addVertexToCheckpointGraph(Point checkpoint) const {
         if (!graph->addVertex(checkpoint)) {
             return false;
         }
@@ -94,19 +97,19 @@ public:
         return true;
     }
 
-    bool addVertexToCheckpointGraph(int x, int y) {
+    bool addVertexToCheckpointGraph(int x, int y) const {
         return addVertexToCheckpointGraph(Point{x, y});
     }
 
-    bool addEdgeToCheckpointGraph(Point checkpoint1, Point checkpoint2) {
+    bool addEdgeToCheckpointGraph(Point checkpoint1, Point checkpoint2) const {
         return graph->addEdge(checkpoint1, checkpoint2);
     }
 
-    bool addEdgeToCheckpointGraph(int x1, int y1, int x2, int y2) {
+    bool addEdgeToCheckpointGraph(int x1, int y1, int x2, int y2) const {
         return addEdgeToCheckpointGraph(Point{x1,y1}, Point{x2,y2});
     }
 
-    bool removeVertexFromCheckpointGraph(Point checkpoint) {
+    bool removeVertexFromCheckpointGraph(Point checkpoint) const {
         bool f = graph->removeVertex(checkpoint);
         mapRenderer->undrawGraphVertices(
             getMappedPixelsCoordinate(checkpoint),
@@ -116,21 +119,21 @@ public:
         return f;
     }
 
-    bool removeVertexFromCheckpointGraph(int x, int y) {
+    bool removeVertexFromCheckpointGraph(int x, int y) const {
         return removeVertexFromCheckpointGraph(Point{x, y});
     }
 
-    bool removeEdgeFromCheckpointGraph(Point checkpoint1, Point checkpoint2) {
+    bool removeEdgeFromCheckpointGraph(Point checkpoint1, Point checkpoint2) const {
         bool f = graph->removeEdge(checkpoint1, checkpoint2);
         mapRenderer->saveModifiedMap(fileName);
         return f;
     }
 
-    bool removeEdgeFromCheckpointGraph(int x1, int y1, int x2, int y2) {
+    bool removeEdgeFromCheckpointGraph(int x1, int y1, int x2, int y2) const {
         return removeEdgeFromCheckpointGraph(Point{x1,y1}, Point{x2,y2});
     }
 
-    std::vector<Point> findGridPath(Point checkpoint1, Point checkpoint2, Hero& hero) {
+    std::vector<Point> findGridPath(Point checkpoint1, Point checkpoint2, Hero& hero) const {
         if (!graph->pointIsVertex(checkpoint1) || !graph->pointIsVertex(checkpoint2)) {
             throw std::invalid_argument("Checkpoint graph does not have such vertex.");
         }
@@ -142,7 +145,7 @@ public:
         return gridPath;
     }
 
-    double findPathAndDraw(Point checkpoint1, Point checkpoint2, Hero& hero) {
+    double findPathAndDraw(Point checkpoint1, Point checkpoint2, Hero& hero) const {
         auto pathWithTime = graphPathfinder->findPath(checkpoint1, checkpoint2, hero);
         auto path = pathWithTime.path;
         auto gridPath = mapPathfinder->makeGridPathFromCheckpointsPath(path, hero);
@@ -155,7 +158,7 @@ public:
         return pathWithTime.time;
     }
 
-    double findPathAndDraw(int x1, int y1, int x2, int y2, Hero& hero) {
+    double findPathAndDraw(int x1, int y1, int x2, int y2, Hero& hero) const {
         return findPathAndDraw(Point{x1, y1}, Point{x2, y2}, hero);
     }
 
@@ -179,12 +182,24 @@ public:
         mapRenderer->cleanMap(fileName);
     }
 
-    void drawAllCheckpoints() {
+    void drawAllCheckpoints() const {
         for (auto checkpoint: graph->getVerticesList()) {
             mapRenderer->drawGraphVertices(
                 getMappedPixelsCoordinate(checkpoint),
                 getMultiplier(checkpoint)
             );
         }
+    }
+
+    void generateCheckpointGraph(int vertexCount) const {
+        GraphGenerator::generate(*graph, vertexCount);
+        mapRenderer->cleanMap(fileName);
+        for (const auto& vertex: graph->getVerticesList()) {
+            mapRenderer->drawGraphVertices(
+                getMappedPixelsCoordinate(vertex),
+              getMultiplier(vertex)
+            );
+        }
+        mapRenderer->saveModifiedMap(fileName);
     }
 };

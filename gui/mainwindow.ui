@@ -32,6 +32,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="btnGenerateGraph">
+        <property name="text">
+         <string>Сгенерировать граф</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QComboBox" name="comboHero">
         <item>
          <property name="text">

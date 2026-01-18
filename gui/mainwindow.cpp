@@ -30,17 +30,14 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    // настройка сцены
     ui->mapView->setScene(scene);
     ui->mapView->viewport()->installEventFilter(this);
 
-    // настройки зума и скролла
     ui->mapView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
     ui->mapView->setResizeAnchor(QGraphicsView::AnchorUnderMouse);
     ui->mapView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->mapView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    // заполнение списка героев
     ui->comboHero->clear();
     ui->comboHero->addItem("");
 
@@ -158,7 +155,6 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
 {
     if (watched == ui->mapView->viewport()) {
 
-        // Зум
         if (event->type() == QEvent::Wheel) {
             QWheelEvent *we = static_cast<QWheelEvent*>(event);
             const double scaleFactor = 1.15;
@@ -370,6 +366,23 @@ void MainWindow::on_btnGenerateNatural_clicked()
 void MainWindow::on_btnGenerateCast_clicked()
 {
     runGenerationDialog(true);
+}
+
+void MainWindow::on_btnGenerateGraph_clicked()
+{
+    if (!manager) {
+        QMessageBox::information(this, "Инфо", "Сначала сгенерируйте карту.");
+        return;
+    }
+
+    bool ok;
+    int count = QInputDialog::getInt(this, "Генерация графа",
+                                     "Количество вершин:", 5, 1, 10000, 1, &ok);
+    if (ok) {
+        manager->generateCheckpointGraph(count);
+        reloadMapImage();
+        ui->lblStatus->setText(QString("Сгенерирован граф: %1 вершин").arg(count));
+    }
 }
 
 void MainWindow::on_btnAddEdge_clicked()

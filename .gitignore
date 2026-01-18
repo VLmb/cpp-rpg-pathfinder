@@ -1,7 +1,7 @@
 tests/build
 .clang-format
-.qtcreator
+.qtcreator/
 palitra.css
 pallette.html
-.idea
-build
+.idea/
+build/

@@ -1,7 +1,7 @@
 // MapGeneratorConfig.h
 #pragma once
 
-namespace map_generator_config {
+namespace map_config {
 
     // пороги высоты: низина / холмы / горы
     inline constexpr double ALTITUDE_LOW_THRESHOLD  = 0.33;

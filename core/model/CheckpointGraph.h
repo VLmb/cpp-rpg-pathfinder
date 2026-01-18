@@ -151,4 +151,9 @@ public:
         }
         return result;
     }
+
+    void reset() {
+        std::fill(isVertex.begin(), isVertex.end(), false);
+        for (auto& v : adjList) v.clear();
+    }
 };

@@ -7,7 +7,9 @@ list(FILTER CORE_SOURCES EXCLUDE REGEX ".*/main\\.cpp$")
 # 3. Создаем библиотеку
 # Важно передать и SOURCES и HEADERS, чтобы файлы отображались в IDE
 add_library(CoreLogic STATIC ${CORE_SOURCES} ${CORE_HEADERS}
-        map-generation/MapConfig.h)
+        map-generation/MapConfig.h
+        view/MapColors.h
+        graph-generation/GraphGenerator.h)
 
 # 4. Настраиваем пути для #include "..."
 target_include_directories(CoreLogic PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

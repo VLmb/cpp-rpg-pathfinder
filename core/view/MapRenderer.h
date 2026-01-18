@@ -6,13 +6,12 @@
 #include <string>
 
 #include "../map-generation/MapGenerator.h"
-#include "../model/Hero.h" 
+#include "../model/Hero.h"
+#include "MapColors.h"
 
 class MapRenderer {
 public:
-    struct Color { 
-        int r, g, b; 
-    };
+    using Color = map_colors::Color;
 
 private:
     int map_width;
@@ -21,50 +20,37 @@ private:
     std::vector<std::vector<Color>> map_basePixels;
     std::vector<std::vector<Color>> map_modifiedPixels;
 
-
-    Color lerpColor(Color c1, Color c2, double t) const {
-        if (t < 0.0) t = 0.0;
-        if (t > 1.0) t = 1.0;
-
-        return {
-            static_cast<int>(c1.r + (c2.r - c1.r) * t),
-            static_cast<int>(c1.g + (c2.g - c1.g) * t),
-            static_cast<int>(c1.b + (c2.b - c1.b) * t)
-        };
-    }
-
-    Color getNaturalBiomeColor(map_generator::BiomeType type) const {
+    static Color getBiomeColor(map_generator::BiomeType type) {
         switch (type) {
-            case map_generator::BiomeType::PLAIN: return {135, 171, 104};
-            case map_generator::BiomeType::FOREST: return {0, 140, 0};
-            case map_generator::BiomeType::WINTER_PLAIN: return {104, 171, 155};
-            case map_generator::BiomeType::WINTER_FOREST: return {18, 127, 91};
+            case map_generator::BiomeType::PLAIN: return map_colors::BIOME_PLAIN;
+            case map_generator::BiomeType::FOREST: return map_colors::BIOME_FOREST;
+            case map_generator::BiomeType::WINTER_PLAIN: return map_colors::BIOME_WINTER_PLAIN;
+            case map_generator::BiomeType::WINTER_FOREST: return map_colors::BIOME_WINTER_FOREST;
 
-            case map_generator::BiomeType::HILLS: return {92, 116, 67};
-            case map_generator::BiomeType::HILLY_JUNGLE: return {0, 100, 0};
-            case map_generator::BiomeType::WINTER_HILLS: return {72, 116, 104};
-            case map_generator::BiomeType::HILLY_WINTER_FOREST: return {13, 85, 71};
+            case map_generator::BiomeType::HILLS: return map_colors::BIOME_HILLS;
+            case map_generator::BiomeType::HILLY_JUNGLE: return map_colors::BIOME_HILLY_JUNGLE;
+            case map_generator::BiomeType::WINTER_HILLS: return map_colors::BIOME_WINTER_HILLS;
+            case map_generator::BiomeType::HILLY_WINTER_FOREST: return map_colors::BIOME_HILLY_WINTER_FOREST;
 
-            case map_generator::BiomeType::ROCKY_PEAKS: return {66, 66, 66};
-            case map_generator::BiomeType::SNOWY_ROCKS: return {195, 196, 197};
+            case map_generator::BiomeType::ROCKY_PEAKS: return map_colors::BIOME_ROCKY_PEAKS;
+            case map_generator::BiomeType::SNOWY_ROCKS: return map_colors::BIOME_SNOWY_ROCKS;
 
-            default:                               return {255, 0, 255};
+            default: return map_colors::BIOME_UNKNOWN;
         }
     }
-    
-    Color getHeroPathColor(const Hero& hero) const {
 
+    static Color getHeroPathColor(const Hero& hero) {
         auto type = hero.getHeroType();
-        
-        if (type == HeroType::ORC)    return {255, 0, 0};
-        if (type == HeroType::WOOD_ELF) return {0, 0, 139};
-        if (type == HeroType::GNOME)    return {0, 0, 0};
-        if (type == HeroType::HUMAN)    return {255, 69, 0};
-        
-        return {255, 50, 50}; // Красный дефолт
+
+        if (type == HeroType::ORC)      return map_colors::HERO_ORC;
+        if (type == HeroType::WOOD_ELF) return map_colors::HERO_WOOD_ELF;
+        if (type == HeroType::GNOME)    return map_colors::HERO_GNOME;
+        if (type == HeroType::HUMAN)    return map_colors::HERO_HUMAN;
+
+        return map_colors::HERO_DEFAULT;
     }
 
-    Color blendColors(Color base, Color overlay, float alpha) const {
+    static Color blendColors(Color base, Color overlay, float alpha) {
         return {
             static_cast<int>(base.r * (1.0f - alpha) + overlay.r * alpha),
             static_cast<int>(base.g * (1.0f - alpha) + overlay.g * alpha),
@@ -109,7 +95,6 @@ private:
         }
     }
 
-
 public:
     MapRenderer(const std::vector<std::vector<map_generator::PixelCell>>& map) {
         if (map.empty()) {
@@ -119,14 +104,11 @@ public:
         map_height = map.size();
         map_width = map[0].size();
 
-        // Инициализируем буфер
         map_basePixels.resize(map_height, std::vector<Color>(map_width));
 
-        // Заполняем цветами биомов (делаем это 1 раз!)
         for (int y = 0; y < map_height; ++y) {
             for (int x = 0; x < map_width; ++x) {
-                // map_basePixels[y][x] = getBiomeColor(map[y][x].biome);
-                map_basePixels[y][x] = getNaturalBiomeColor(map[y][x].biome);
+                map_basePixels[y][x] = getBiomeColor(map[y][x].biome);
             }
         }
 
@@ -142,11 +124,10 @@ public:
     }
 
     void drawPath(
-        const std::vector<Point>& gridPath, 
-        const Hero& hero, 
+        const std::vector<Point>& gridPath,
+        const Hero& hero,
         int factor
     ) {
-
         Color pathColor = getHeroPathColor(hero);
 
         for (const auto& point : gridPath) {
@@ -158,23 +139,19 @@ public:
         const Point vertice,
         int vertexSize
     ) {
-        Color borderColor = {255, 0, 0};
-        Color centerColor = {255, 255, 0};
+        Color borderColor = map_colors::GRAPH_VERTEX_BORDER;
+        Color centerColor = map_colors::GRAPH_VERTEX_CENTER;
 
-        // Incoming point is in grid coordinates; convert to pixel space.
         int startX = vertice.x;
         int startY = vertice.y;
 
-        // Рисуем квадрат vertexSize x vertexSize от (startX, startY)
         for (int dy = 0; dy < vertexSize; ++dy) {
             for (int dx = 0; dx < vertexSize; ++dx) {
                 int px = startX + dx;
                 int py = startY + dy;
 
-                // Проверка границ карты (чтобы не вылететь за массив)
                 if (px >= 0 && px < map_width && py >= 0 && py < map_height) {
 
-                    // Логика рамки: если это крайние пиксели квадрата
                     if (dx == 0 || dx == vertexSize - 1 || dy == 0 || dy == vertexSize - 1) {
                         map_modifiedPixels[py][px] = borderColor;
                     } else {
@@ -204,7 +181,7 @@ public:
         }
     }
 
-    void cleanMap(std::string& filename) {
+    void cleanMap(std::string filename) {
         map_modifiedPixels = map_basePixels;
         saveModifiedMap(filename);
     }
